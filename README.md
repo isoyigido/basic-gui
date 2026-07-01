@@ -65,9 +65,4 @@ dependencies {
 * **isoyigido** - [GitHub Profile](https://github.com/isoyigido)
 
 ## License
-This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](LICENSE).
-
-**Summary:**
-- **Attribution:** You must give appropriate credit.
-- **Non-Commercial:** You may not use this material for commercial purposes.
-- **No Warranty:** This software is provided "as is" without any warranty.
+This project is licensed under the [Apache License 2.0](LICENSE).
