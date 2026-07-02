@@ -39,3 +39,6 @@ build/
 
 ### Logs ###
 logs/
+
+### node.js ###
+node_modules/
