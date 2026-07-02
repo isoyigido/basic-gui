@@ -1,36 +1,44 @@
-- name: Install dependencies
-  run: npm install
+name: Release Pipeline
 
-- name: Release
-  on:
-    push:
-      branches: [master]
-  jobs:
-    release:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write # Needed for creating tags and releases
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-        - name: Setup Java
-          uses: actions/setup-java@v4
-          with:
-            java-version: '24'
-            distribution: 'temurin'
-        - name: Release
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: npx semantic-release
-        - name: Generate and Deploy Javadoc
-          run: |
-            mvn javadoc:javadoc
-            # Deploying to GitHub Pages
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git checkout -b gh-pages
-            cp -r target/site/apidocs/* .
-            git add .
-            git commit -m "docs: update Javadoc documentation"
-            git push origin gh-pages --force
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-and-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Run Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc
+
+      - name: Deploy Javadoc
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          cp -r target/site/apidocs/* . 
+          git add .
+          git commit -m "docs: update Javadoc documentation"
+          git push origin gh-pages --force
