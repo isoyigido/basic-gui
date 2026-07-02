@@ -22,6 +22,9 @@ jobs:
           java-version: '24'
           distribution: 'temurin'
 
+      - name: Clean npm cache
+        run: npm cache clean --force
+
       - name: Install Node Dependencies
         run: npm install
 
