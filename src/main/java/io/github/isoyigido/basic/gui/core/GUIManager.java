@@ -12,10 +12,8 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
@@ -79,7 +77,7 @@ public final class GUIManager {
     /// @throws NullPointerException if the input `gui` is null
     public static void setGUI(GUI gui) {
         // If the given GUI is null, throw a null pointer exception
-        if (gui == null) throw new NullPointerException("GUI to set is null.");
+        Objects.requireNonNull(gui, "GUI to set is null.");
 
         // Compile the given GUI
         gui.compile();
