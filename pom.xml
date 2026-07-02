@@ -21,6 +21,9 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.12.0</version>
                 <configuration>
+                    <!-- Force generation into target/site/apidocs -->
+                    <outputDirectory>${project.build.directory}/site</outputDirectory>
+
                     <!-- Register custom JDK tags to avoid compiler errors -->
                     <tags>
                         <tag>
