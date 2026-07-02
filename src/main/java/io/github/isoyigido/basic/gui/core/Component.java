@@ -38,7 +38,7 @@ public abstract class Component {
     private Widget widget = null;
 
     /// The list of child widgets of this component
-    final List<Widget> childWidgets = new ArrayList<>();
+    final List<Widget> childWidgets = new ArrayList<>(4);
 
     /// Constructs a component with the given width and height.
     /// @param width the width of the component (in pixels)
@@ -83,8 +83,8 @@ public abstract class Component {
     /// @param y the y-coordinate
     /// @return whether the given coordinates lie within the boundaries of this component
     public boolean contains(int x, int y) {
-        return     x >= 0 && x < this.width   //     x-coordinate is within bounds
-                && y >= 0 && y < this.height; // and y-coordinate is within bounds
+        return     (x >= 0) && (x < this.width)   //     x-coordinate is within bounds
+                && (y >= 0) && (y < this.height); // and y-coordinate is within bounds
     }
 
     // --- GETTERS ---
@@ -103,7 +103,7 @@ public abstract class Component {
     /// Returns whether the rendering context is clipped to the bounding box when rendering this component.
     /// @return whether the rendering context is clipped to the bounding box when rendering this component
     public boolean isClipped() {
-        return clipped;
+        return this.clipped;
     }
 
     /// Returns the rendering offset for this component on the x-axis.

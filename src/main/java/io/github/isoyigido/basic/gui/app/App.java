@@ -11,6 +11,11 @@ import java.awt.*;
 /// @see ColorProfile
 /// @see Font
 public final class App {
+    /// Private constructor to prevent instantiation
+    private App() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated.");
+    }
+
     /// Current color profile of the application
     private static ColorProfile colorProfile = new ColorProfile(
             ColorSet.of(Color.BLACK, false),
@@ -36,8 +41,11 @@ public final class App {
         App.colorProfile = colorProfile;
     }
 
+    /// The default font size of the application
+    private static final int DEFAULT_FONT_SIZE = 24;
+
     /// Current text font of the application
-    private static Font font = new Font("Calibri", Font.PLAIN, 24);
+    private static Font font = new Font("Calibri", Font.PLAIN, App.DEFAULT_FONT_SIZE);
 
     /// Returns the current text font of the application with the given font size.
     /// @param size the font size (in points)

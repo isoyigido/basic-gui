@@ -98,7 +98,7 @@ public final class Widget {
     }
 
     /// Updates the x-coordinate of this widget to stay anchored to the anchor point.
-    public void updateX() {
+    void updateX() {
         // Set the x-coordinate based on the anchor
         this.x = switch (this.anchor) {
             case TOP_LEFT, LEFT, BOTTOM_LEFT    -> this.anchorX;
@@ -108,7 +108,7 @@ public final class Widget {
     }
 
     /// Updates the y-coordinate of this widget to stay anchored to the anchor point.
-    public void updateY() {
+    void updateY() {
         // Set the y-coordinate based on the anchor point
         this.y = switch (this.anchor) {
             case TOP_LEFT, TOP, TOP_RIGHT          -> this.anchorY;
@@ -159,9 +159,9 @@ public final class Widget {
 
     /// Recursively sorts the child widgets of this widget based on their layer indices.
     /// Forwards this call to the child widgets to ensure their child widgets are also sorted.
-    public void sortChildWidgetsBasedOnLayerIndex() {
+    void sortChildWidgetsBasedOnLayerIndex() {
         // Sort the child widgets based on their layer indices
-        sortBasedOnLayerIndex(this.component.childWidgets);
+        Widget.sortBasedOnLayerIndex(this.component.childWidgets);
 
         // Forward the call to each child widget
         this.component.childWidgets.forEach(Widget::sortChildWidgetsBasedOnLayerIndex);
@@ -170,7 +170,7 @@ public final class Widget {
     /// Sorts the given list of widgets based on their layer indices,
     /// where the widget with the smallest layer index appears first on the list.
     /// @param widgets the list of widgets to sort
-    public static void sortBasedOnLayerIndex(List<Widget> widgets) {
+    static void sortBasedOnLayerIndex(List<Widget> widgets) {
         // Sort the widgets based on their layer indices
         widgets.sort(Comparator.comparingInt(Widget::getLayerIndex));
     }
@@ -270,7 +270,7 @@ public final class Widget {
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
-    public void onMouseClicked(int x, int y, MouseButton mouseButton) {
+    void onMouseClicked(int x, int y, MouseButton mouseButton) {
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -288,7 +288,7 @@ public final class Widget {
     /// @param x the x-coordinate of the press
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
-    public void onMousePressed(int x, int y, MouseButton mouseButton) {
+    void onMousePressed(int x, int y, MouseButton mouseButton) {
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -304,7 +304,7 @@ public final class Widget {
 
     /// Forwards the mouse release event to the contained component and its child widgets.
     /// @param mouseButton the mouse button that is released
-    public void onMouseReleased(MouseButton mouseButton) {
+    void onMouseReleased(MouseButton mouseButton) {
         // Forward the mouse release event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onMouseReleased(mouseButton);
@@ -317,7 +317,7 @@ public final class Widget {
     /// Forwards the mouse move event to the contained component and its child widgets. Localizes the input coordinates.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
-    public void onMouseMoved(int x, int y) {
+    void onMouseMoved(int x, int y) {
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -335,7 +335,7 @@ public final class Widget {
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
-    public void onMouseDragged(int x, int y, MouseButton mouseButton) {
+    void onMouseDragged(int x, int y, MouseButton mouseButton) {
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -351,7 +351,7 @@ public final class Widget {
 
     /// Forwards the mouse wheel move event to the contained component and its child widgets.
     /// @param e the mouse wheel event
-    public void onMouseWheelMoved(MouseWheelEvent e) {
+    void onMouseWheelMoved(MouseWheelEvent e) {
         // Forward the mouse wheel move event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onMouseWheelMoved(e);
@@ -363,7 +363,7 @@ public final class Widget {
 
     /// Forwards the key typing event to the contained component and its child widgets.
     /// @param e the key event
-    public void onKeyTyped(KeyEvent e) {
+    void onKeyTyped(KeyEvent e) {
         // Forward the key typing event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyTyped(e);
@@ -375,7 +375,7 @@ public final class Widget {
 
     /// Forwards the key pressing event to the contained component and its child widgets.
     /// @param e the key event
-    public void onKeyPressed(KeyEvent e) {
+    void onKeyPressed(KeyEvent e) {
         // Forward the key press event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyPressed(e);
@@ -387,7 +387,7 @@ public final class Widget {
 
     /// Forwards the key releasing event to the contained component and its child widgets.
     /// @param e the key event
-    public void onKeyReleased(KeyEvent e) {
+    void onKeyReleased(KeyEvent e) {
         // Forward the key release event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyReleased(e);
@@ -402,8 +402,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget center(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget center(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.CENTER);
     }
 
@@ -411,8 +411,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget left(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget left(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.LEFT);
     }
 
@@ -420,8 +420,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget right(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget right(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.RIGHT);
     }
 
@@ -429,8 +429,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget top(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget top(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.TOP);
     }
 
@@ -438,8 +438,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget bottom(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget bottom(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.BOTTOM);
     }
 
@@ -447,8 +447,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget topLeft(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget topLeft(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.TOP_LEFT);
     }
 
@@ -456,8 +456,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget topRight(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget topRight(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.TOP_RIGHT);
     }
 
@@ -465,8 +465,8 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget bottomLeft(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget bottomLeft(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.BOTTOM_LEFT);
     }
 
@@ -474,15 +474,15 @@ public final class Widget {
     /// @param component the contained component
     /// @param x the x-coordinate
     /// @param y the y-coordinate
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget bottomRight(Component component, int x, int y) {
+    /// @return a new `Widget` object containing the given component
+    static Widget bottomRight(Component component, int x, int y) {
         return new Widget(component, x, y, Anchor.BOTTOM_RIGHT);
     }
 
     /// Returns a widget containing the given component centered at the center of the screen.
     /// @param component the contained component
-    /// @return a new {@link Widget} object containing the given component
-    public static Widget center(Component component) {
+    /// @return a new `Widget` object containing the given component
+    static Widget center(Component component) {
         return Widget.center(component, ScreenConfig.xCenter, ScreenConfig.yCenter);
     }
 }

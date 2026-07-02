@@ -16,7 +16,7 @@ import java.util.List;
 /// @see GUIManager
 public abstract class GUI {
     /// The list of widgets contained in this GUI
-    private final List<Widget> widgets = new ArrayList<>();
+    private final List<Widget> widgets = new ArrayList<>(8);
 
     /// Whether input events are enabled
     private boolean inputEnabled = true;
@@ -42,7 +42,7 @@ public abstract class GUI {
     }
 
     /// Compiles this GUI, running {@link #onCompilation()} and sorting the widgets based on their layer indices.
-    public final void compile() {
+    void compile() {
         // If already compiled, return
         if (this.compiled) return;
 

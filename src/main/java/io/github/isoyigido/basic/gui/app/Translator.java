@@ -17,6 +17,11 @@ import java.util.Optional;
 
 /// Stores translations. The language can be changed using {@link #setLanguage(String, String)} to load a JSON file containing translations. The stored translations can be accessed using {@link #get(String)}.
 public final class Translator {
+    /// Private constructor to prevent instantiation
+    private Translator() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated.");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(Translator.class);
 
     /// The language code of the currently loaded language (e.g., `en`)
@@ -74,7 +79,7 @@ public final class Translator {
     ///         or an empty {@link Optional} if an {@link IOException} is caught
     private static Optional<JsonObject> loadTranslations(String directory, String languageCode) {
         // Get the path inside the resources folder
-        String resourcePath = directory + "/" + languageCode + ".json";
+        String resourcePath = directory + '/' + languageCode + ".json";
 
         // Get the language file as an input stream
         try (InputStream is = Main.class.getResourceAsStream(resourcePath)) {
@@ -110,7 +115,7 @@ public final class Translator {
     /// @return the {@link HashMap} containing the JSON data
     private static Map<String, String> flatten(JsonObject json) {
         // Initialize the hash map
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(256);
 
         // Flatten the JSON recursively
         flatten("", json, result);
@@ -127,7 +132,7 @@ public final class Translator {
         // For each entry in the current JSON scope
         json.entrySet().forEach(entry ->  {
             // Get flattened key for the entry
-            String key = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+            String key = prefix.isEmpty() ? entry.getKey() : (prefix + '.' + entry.getKey());
             // Get the value
             JsonElement value = entry.getValue();
 

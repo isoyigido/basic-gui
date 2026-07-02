@@ -18,7 +18,7 @@ public abstract class Alert {
 
     /// Sets the list of alerts that contains this alert.
     /// @param parentList the list of alerts that contains this alert
-    public void setParentList(List<Alert> parentList) {
+    void setParentList(List<Alert> parentList) {
         this.parentList = parentList;
     }
 

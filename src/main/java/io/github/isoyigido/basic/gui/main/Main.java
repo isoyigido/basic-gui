@@ -1,10 +1,19 @@
 package io.github.isoyigido.basic.gui.main;
 
+import io.github.isoyigido.basic.gui.core.GUIManager;
 import io.github.isoyigido.basic.gui.window.BasicPanel;
 
 /// Contains the method {@link #startMainLoop(BasicPanel, int, int)} to start the main rendering and update loop.
 /// @see BasicPanel
 public final class Main {
+    /// Private constructor to prevent instantiation
+    private Main() {
+        throw new UnsupportedOperationException("Main class cannot be instantiated.");
+    }
+
+    /// Constant for the number of nanoseconds in a second (one billion)
+    private static final double NANOSECONDS_PER_SECOND = 1_000_000_000;
+
     /// Starts the main rendering and update loop on a new thread.
     /// @param panel the panel that is rendered on and updated
     /// @param fps number of frames (render calls) per second
@@ -13,8 +22,8 @@ public final class Main {
         // On a new thread
         new Thread(() -> {
             // Calculate the nanoseconds per frame and update
-            double nanosecondsPerFrame = 1000000000.0 / fps;
-            double nanosecondsPerUpdate = 1000000000.0 / ups;
+            double nanosecondsPerFrame = Main.NANOSECONDS_PER_SECOND / fps;
+            double nanosecondsPerUpdate = Main.NANOSECONDS_PER_SECOND / ups;
 
             // Initialize the previous time in nanoseconds
             long previousTime = System.nanoTime();
@@ -38,7 +47,7 @@ public final class Main {
                 // If enough time has passed for an update
                 if (deltaU >= nanosecondsPerUpdate) {
                     // Do one update
-                    panel.update();
+                    GUIManager.update();
 
                     // Decrease update timer
                     deltaU -= nanosecondsPerUpdate;

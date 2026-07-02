@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
@@ -26,6 +27,11 @@ import java.util.function.Supplier;
 /// @see Overlay
 /// @see Alert
 public final class GUIManager {
+    /// Private constructor to prevent instantiation
+    private GUIManager() {
+        throw new UnsupportedOperationException("Utility cannot be instantiated.");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(GUIManager.class);
 
     /// The panel linked to the displayed window
@@ -44,10 +50,10 @@ public final class GUIManager {
     private static final List<Alert> activeAlerts = new CopyOnWriteArrayList<>();
 
     /// The map of global key binds (key, action)
-    private static final Map<Character, Runnable> globalKeyBinds = new HashMap<>();
+    private static final Map<Character, Runnable> globalKeyBinds = new HashMap<>(4);
 
     /// The robot responsible for automated inputs
-    private static Robot robot;
+    private static Robot robot = null;
 
     static {
         try {
@@ -121,7 +127,7 @@ public final class GUIManager {
     public static Cursor getCursor() {
         // If a panel is linked, return the current mouse cursor
         // Else, return the default mouse cursor
-        return panel == null ? Cursors.DEFAULT : panel.getCursor();
+        return Optional.ofNullable(panel).map(Component::getCursor).orElse(Cursors.DEFAULT);
     }
 
     /// Sets the mouse cursor.

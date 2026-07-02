@@ -34,13 +34,13 @@ public record ColorSet(Color base, Color brighter, Color darker, Color hovered, 
     /// @return the color with the changed `lightness` value
     private static Color offsetLightness(Color base, float offset) {
         // If there is no offset, return the base color
-        if (offset == 0f) return base;
+        if (offset == 0.0f) return base;
 
         // Get the HSL (Hue, Saturation, Lightness) values of the color
         float[] hsl = RGBtoHSL(base);
 
         // Offset the Lightness value safely between 0.0 and 1.0
-        hsl[2] = Math.clamp(hsl[2] + offset, 0f, 1f);
+        hsl[2] = Math.clamp(hsl[2] + offset, 0.0f, 1.0f);
 
         // Return a new color with the new HSL values, preserving the alpha channel
         return HSLtoRGB(hsl[0], hsl[1], hsl[2], base.getAlpha());
@@ -51,32 +51,32 @@ public record ColorSet(Color base, Color brighter, Color darker, Color hovered, 
     /// @return a `float` array containing HSL values: `[0]=Hue`, `[1]=Saturation`, `[2]=Lightness`.
     private static float[] RGBtoHSL(Color color) {
         // Normalize RGB values to the range [0, 1]
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
+        float r = color.getRed() / 255.0f;
+        float g = color.getGreen() / 255.0f;
+        float b = color.getBlue() / 255.0f;
 
         // Get the maximum and minimum values
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
 
         // Initialize HSL values
-        float h = 0f, s = 0f, l = (max + min) / 2f;
+        float h = 0.0f, s = 0.0f, l = (max + min) / 2.0f;
 
         // If the color is not achromatic (grayscale)
         if (max != min) {
             // Calculate Saturation based on Lightness
             float d = max - min;
-            s = l > 0.5f ? d / (2f - max - min) : d / (max + min);
+            s = d / ((l > 0.5f) ? (2.0f - max - min) : (max + min));
 
             // Calculate Hue based on which RGB component is dominant
             if (max == r) {
-                h = (g - b) / d + (g < b ? 6f : 0f);
+                h = ((g - b) / d) + ((g < b) ? 6.0f : 0.0f);
             } else if (max == g) {
-                h = (b - r) / d + 2f;
+                h = ((b - r) / d) + 2.0f;
             } else if (max == b) {
-                h = (r - g) / d + 4f;
+                h = ((r - g) / d) + 4.0f;
             }
-            h /= 6f; // Normalize hue to [0, 1]
+            h /= 6.0f; // Normalize hue to [0, 1]
         }
 
         // Return the HSL values
@@ -94,20 +94,20 @@ public record ColorSet(Color base, Color brighter, Color darker, Color hovered, 
         float r, g, b;
 
         // Saturation is 0 -> achromatic color (grayscale)
-        if (s == 0f) r = g = b = l;
+        if (s == 0.0f) r = g = b = l;
         else {
             // Intermediate values for conversion logic
-            float q = l < 0.5f ? l * (1f + s) : l + s - l * s;
-            float p = 2f * l - q;
+            float q = (l < 0.5f) ? (l * (1.0f + s)) : ((l + s) - (l * s));
+            float p = (2.0f * l) - q;
 
             // Calculate individual RGB channels
-            r = hueToRGB(p, q, h + 1f / 3f);
+            r = hueToRGB(p, q, h + (1.0f / 3.0f));
             g = hueToRGB(p, q, h);
-            b = hueToRGB(p, q, h - 1f / 3f);
+            b = hueToRGB(p, q, h - (1.0f / 3.0f));
         }
 
         // Return a new color with the RGB values and the alpha value
-        return new Color(Math.round(r * 255f), Math.round(g * 255f), Math.round(b * 255f), alpha);
+        return new Color(Math.round(r * 255.0f), Math.round(g * 255.0f), Math.round(b * 255.0f), alpha);
     }
 
     /// Helper method: Converts a specific hue segment to an RGB channel value.
@@ -117,13 +117,13 @@ public record ColorSet(Color base, Color brighter, Color darker, Color hovered, 
     /// @return the normalized channel value within `[0.0, 1.0]`.
     private static float hueToRGB(float p, float q, float t) {
         // Ensure t stays within the [0, 1] circle
-        if      (t < 0f) t += 1f;
-        else if (t > 1f) t -= 1f;
+        if      (t < 0.0f) t += 1.0f;
+        else if (t > 1.0f) t -= 1.0f;
 
         // Linear interpolation based on hue segments
-        if (t < 1f / 6f) return p + (q - p) * 6f * t;
-        if (t < 1f / 2f) return q;
-        if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6f;
+        if (t < (1.0f / 6.0f)) return p + ((q - p) * 6.0f * t);
+        if (t < (1.0f / 2.0f)) return q;
+        if (t < (2.0f / 3.0f)) return p + ((q - p) * ((2.0f / 3.0f) - t) * 6.0f);
         return p;
     }
 
@@ -145,12 +145,21 @@ public record ColorSet(Color base, Color brighter, Color darker, Color hovered, 
         return offsetLightness(base, -LIGHTNESS_CHANGE);
     }
 
+    /// The grayscale luminance factor for the red channel
+    private static final float RED_FACTOR = 0.299f;
+
+    /// The grayscale luminance factor for the green channel
+    private static final float GREEN_FACTOR = 0.587f;
+
+    /// The grayscale luminance factor for the blue channel
+    private static final float BLUE_FACTOR = 0.114f;
+
     /// Helper method: Returns the grayscale representation of the given base color.
     /// @param base the base color
     /// @return the grayscale color
     private static Color grayscale(Color base) {
         // Calculate the luminance value with precomputed RGB factors
-        int luminance = (int) Math.round(base.getRed() * 0.299 + base.getGreen() * 0.587 + base.getBlue() * 0.114);
+        int luminance = Math.round((base.getRed() * RED_FACTOR) + (base.getGreen() * GREEN_FACTOR) + (base.getBlue() * BLUE_FACTOR));
 
         // Return a new grayscale color with the luminance value, preserving the alpha channel
         return new Color(luminance, luminance, luminance, base.getAlpha());

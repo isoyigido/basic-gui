@@ -10,7 +10,7 @@ import java.awt.event.*;
 /// @see MouseMotionListener
 /// @see MouseWheelListener
 /// @see GUIManager
-public final class MouseInputListener implements MouseListener, MouseMotionListener, MouseWheelListener {
+public final class MouseInputListener extends MouseAdapter {
     /// The x-coordinate of the mouse cursor on the virtual screen
     private int mouseX;
 
@@ -68,12 +68,6 @@ public final class MouseInputListener implements MouseListener, MouseMotionListe
         // Register a mouse wheel move event
         GUIManager.onMouseWheelMoved(e);
     }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-
-    @Override
-    public void mouseExited(MouseEvent e) {}
 
     /// Returns the x-coordinate of the mouse cursor on the virtual screen.
     /// @return the x-coordinate of the mouse cursor
