@@ -1,33 +1,36 @@
-name: Release
-on:
-  push:
-    branches: [master]
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Needed for creating tags and releases
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '24'
-          distribution: 'temurin'
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
-      - name: Generate and Deploy Javadoc
-        run: |
-          mvn javadoc:javadoc
-          # Deploying to GitHub Pages
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages
-          cp -r target/site/apidocs/* .
-          git add .
-          git commit -m "docs: update Javadoc documentation"
-          git push origin gh-pages --force
+- name: Install dependencies
+  run: npm install
+
+- name: Release
+  on:
+    push:
+      branches: [master]
+  jobs:
+    release:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write # Needed for creating tags and releases
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - name: Setup Java
+          uses: actions/setup-java@v4
+          with:
+            java-version: '24'
+            distribution: 'temurin'
+        - name: Release
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: npx semantic-release
+        - name: Generate and Deploy Javadoc
+          run: |
+            mvn javadoc:javadoc
+            # Deploying to GitHub Pages
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout -b gh-pages
+            cp -r target/site/apidocs/* .
+            git add .
+            git commit -m "docs: update Javadoc documentation"
+            git push origin gh-pages --force
