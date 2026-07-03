@@ -1,6 +1,5 @@
 package io.github.isoyigido.basic.gui.core;
 
-import io.github.isoyigido.basic.gui.inputs.MouseButton;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 
 import java.awt.*;

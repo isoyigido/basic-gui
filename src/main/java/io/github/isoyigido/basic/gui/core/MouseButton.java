@@ -1,4 +1,4 @@
-package io.github.isoyigido.basic.gui.inputs;
+package io.github.isoyigido.basic.gui.core;
 
 import java.awt.event.MouseEvent;
 

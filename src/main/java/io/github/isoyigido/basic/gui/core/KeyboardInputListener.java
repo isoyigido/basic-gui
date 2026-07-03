@@ -1,6 +1,4 @@
-package io.github.isoyigido.basic.gui.inputs;
-
-import io.github.isoyigido.basic.gui.core.GUIManager;
+package io.github.isoyigido.basic.gui.core;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;

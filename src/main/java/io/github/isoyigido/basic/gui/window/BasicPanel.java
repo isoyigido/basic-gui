@@ -2,8 +2,8 @@ package io.github.isoyigido.basic.gui.window;
 
 import io.github.isoyigido.basic.gui.app.App;
 import io.github.isoyigido.basic.gui.core.GUIManager;
-import io.github.isoyigido.basic.gui.inputs.KeyboardInputListener;
-import io.github.isoyigido.basic.gui.inputs.MouseInputListener;
+import io.github.isoyigido.basic.gui.core.KeyboardInputListener;
+import io.github.isoyigido.basic.gui.core.MouseInputListener;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,7 +1,5 @@
 package io.github.isoyigido.basic.gui.core;
 
-import io.github.isoyigido.basic.gui.inputs.MouseButton;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;

@@ -1,7 +1,5 @@
 package io.github.isoyigido.basic.gui.core;
 
-import io.github.isoyigido.basic.gui.inputs.MouseButton;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
@@ -119,7 +117,7 @@ public abstract class GUI {
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
-    public void onMouseClicked(int x, int y, MouseButton mouseButton) {
+    void onMouseClicked(int x, int y, MouseButton mouseButton) {
         // If input is enabled, forward the mouse click event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMouseClicked(x, y, mouseButton);
@@ -133,7 +131,7 @@ public abstract class GUI {
     /// @param x the x-coordinate of the press
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
-    public void onMousePressed(int x, int y, MouseButton mouseButton) {
+    void onMousePressed(int x, int y, MouseButton mouseButton) {
         // If input is enabled, forward the mouse press event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMousePressed(x, y, mouseButton);
@@ -145,7 +143,7 @@ public abstract class GUI {
 
     /// Forwards the mouse release event to the widgets contained in this GUI.
     /// @param mouseButton the mouse button that is released
-    public void onMouseReleased(MouseButton mouseButton) {
+    void onMouseReleased(MouseButton mouseButton) {
         // If input is enabled, forward the mouse release event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMouseReleased(mouseButton);
@@ -158,7 +156,7 @@ public abstract class GUI {
     /// Forwards the mouse move event to the widgets contained in this GUI.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
-    public void onMouseMoved(int x, int y) {
+    void onMouseMoved(int x, int y) {
         // If input is enabled, forward the mouse move event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMouseMoved(x, y);
@@ -172,7 +170,7 @@ public abstract class GUI {
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
-    public void onMouseDragged(int x, int y, MouseButton mouseButton) {
+    void onMouseDragged(int x, int y, MouseButton mouseButton) {
         // If input is enabled, forward the mouse drag event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMouseDragged(x, y, mouseButton);
@@ -184,7 +182,7 @@ public abstract class GUI {
 
     /// Forwards the mouse wheel move event to the widgets contained in this GUI.
     /// @param e the mouse wheel event
-    public void onMouseWheelMoved(MouseWheelEvent e) {
+    void onMouseWheelMoved(MouseWheelEvent e) {
         // If input is enabled, forward the mouse wheel event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onMouseWheelMoved(e);
@@ -199,7 +197,7 @@ public abstract class GUI {
 
     /// Forwards the key typing event to the widgets contained in this GUI.
     /// @param e the key event
-    public void onKeyTyped(KeyEvent e) {
+    void onKeyTyped(KeyEvent e) {
         // If input is enabled, forward the key typing event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onKeyTyped(e);
@@ -214,7 +212,7 @@ public abstract class GUI {
 
     /// Forwards the key pressing event to the widgets contained in this GUI.
     /// @param e the key event
-    public void onKeyPressed(KeyEvent e) {
+    void onKeyPressed(KeyEvent e) {
         // If input is enabled, forward the key press event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onKeyPressed(e);
@@ -229,7 +227,7 @@ public abstract class GUI {
 
     /// Forwards the key releasing event to the widgets contained in this GUI.
     /// @param e the key event
-    public void onKeyReleased(KeyEvent e) {
+    void onKeyReleased(KeyEvent e) {
         // If input is enabled, forward the key release event to each element
         if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
             this.widgets.get(i).onKeyReleased(e);

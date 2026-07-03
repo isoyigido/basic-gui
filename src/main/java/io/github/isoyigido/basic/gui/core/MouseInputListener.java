@@ -1,6 +1,5 @@
-package io.github.isoyigido.basic.gui.inputs;
+package io.github.isoyigido.basic.gui.core;
 
-import io.github.isoyigido.basic.gui.core.GUIManager;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 
 import java.awt.event.*;

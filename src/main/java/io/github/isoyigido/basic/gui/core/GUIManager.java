@@ -1,7 +1,6 @@
 package io.github.isoyigido.basic.gui.core;
 
 import io.github.isoyigido.basic.gui.constants.Cursors;
-import io.github.isoyigido.basic.gui.inputs.MouseButton;
 import io.github.isoyigido.basic.gui.window.BasicPanel;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 import org.slf4j.Logger;
@@ -202,7 +201,7 @@ public final class GUIManager {
         activeAlerts.add(alert);
     }
 
-    /// Sets a global key bind.
+    /// Sets a global key bind. Can be called multiple times with
     /// @param key the character of the bound key
     /// @param action the action that is run when the bound key is pressed
     public static void setGlobalKeyBind(char key, Runnable action) {
@@ -215,7 +214,7 @@ public final class GUIManager {
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
-    public static void onMouseClicked(int x, int y, MouseButton mouseButton) {
+    static void onMouseClicked(int x, int y, MouseButton mouseButton) {
         if (overlay == null) currentGUI.onMouseClicked(x, y, mouseButton);
     }
 
@@ -223,20 +222,20 @@ public final class GUIManager {
     /// @param x the x-coordinate of the press
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
-    public static void onMousePressed(int x, int y, MouseButton mouseButton) {
+    static void onMousePressed(int x, int y, MouseButton mouseButton) {
         if (overlay == null) currentGUI.onMousePressed(x, y, mouseButton);
     }
 
     /// Forwards the mouse release event to the current GUI.
     /// @param mouseButton the mouse button that is released
-    public static void onMouseReleased(MouseButton mouseButton) {
+    static void onMouseReleased(MouseButton mouseButton) {
         currentGUI.onMouseReleased(mouseButton);
     }
 
     /// Forwards the mouse move event to the current GUI.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
-    public static void onMouseMoved(int x, int y) {
+    static void onMouseMoved(int x, int y) {
         if (overlay == null) currentGUI.onMouseMoved(x, y);
     }
 
@@ -244,19 +243,19 @@ public final class GUIManager {
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
-    public static void onMouseDragged(int x, int y, MouseButton mouseButton) {
+    static void onMouseDragged(int x, int y, MouseButton mouseButton) {
         if (overlay == null) currentGUI.onMouseDragged(x, y, mouseButton);
     }
 
     /// Forwards the mouse wheel move event to the current GUI.
     /// @param e the mouse wheel event
-    public static void onMouseWheelMoved(MouseWheelEvent e) {
+    static void onMouseWheelMoved(MouseWheelEvent e) {
         if (overlay == null) currentGUI.onMouseWheelMoved(e);
     }
 
     /// Forwards the key typing event to the current GUI.
     /// @param e the key event
-    public static void onKeyTyped(KeyEvent e) {
+    static void onKeyTyped(KeyEvent e) {
         if (overlay == null) currentGUI.onKeyTyped(e);
 
         // If the key typing event has not been consumed
@@ -274,13 +273,13 @@ public final class GUIManager {
 
     /// Forwards the key pressing event to the current GUI.
     /// @param e the key event
-    public static void onKeyPressed(KeyEvent e) {
+    static void onKeyPressed(KeyEvent e) {
         if (overlay == null) currentGUI.onKeyPressed(e);
     }
 
     /// Forwards the key releasing event to the current GUI.
     /// @param e the key event
-    public static void onKeyReleased(KeyEvent e) {
+    static void onKeyReleased(KeyEvent e) {
         currentGUI.onKeyReleased(e);
     }
 }
