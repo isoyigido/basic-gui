@@ -187,7 +187,7 @@ public final class GUIManager {
 
     /// Sets the overlay to the given overlay.
     /// @param overlay the new overlay, or null for no overlay
-    public static void setCurrentOverlay(Overlay overlay) {
+    public static void setOverlay(Overlay overlay) {
         GUIManager.overlay = overlay;
     }
 
