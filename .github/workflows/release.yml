@@ -33,6 +33,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
+      - name: Build Project
+        run: mvn clean compile
+
       - name: Generate Javadoc
         run: mvn javadoc:javadoc
 
