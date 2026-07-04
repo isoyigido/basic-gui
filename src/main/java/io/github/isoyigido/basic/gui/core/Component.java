@@ -22,10 +22,10 @@ public abstract class Component {
     int height;
 
     /// The bounding box of the component
-    final Rectangle boundingBox;
+    final Rectangle boundingBox = new Rectangle();
 
     /// Whether the rendering context is clipped to the bounding box when rendering this component
-    final boolean clipped;
+    boolean clipped;
 
     /// The rendering offset for this component on the x-axis
     int offsetX = 0;
@@ -39,6 +39,14 @@ public abstract class Component {
     /// The list of child widgets of this component
     final List<Widget> childWidgets = new ArrayList<>(4);
 
+    /// Constructs a component with zero dimensions.
+    /// @param clipped whether the rendering context is clipped to the bounding box when rendering the component
+    /// @apiNote This initializes a placeholder component before its size is
+    ///          explicitly set in the constructor of the class that implements this.
+    public Component(boolean clipped) {
+        this(0, 0, clipped);
+    }
+
     /// Constructs a component with the given width and height.
     /// @param width the width of the component (in pixels)
     /// @param height the height of the component (in pixels)
@@ -47,7 +55,6 @@ public abstract class Component {
         // Set the width and height
         this.width = width;
         this.height = height;
-        this.boundingBox = new Rectangle();
 
         // Update the bounding box
         this.updateBoundingBox();
@@ -73,7 +80,7 @@ public abstract class Component {
     /// Adds the given widget as a child widget of this component.
     /// @param widget the widget to be added as a child to this component
     /// @throws NullPointerException if the input `widget` is null
-    public void addWidget(Widget widget) {
+    protected void addWidget(Widget widget) {
         Objects.requireNonNull(widget, "Widget to add as a child cannot be null.");
 
         // Add the widget to the list of child widgets
@@ -138,7 +145,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param width the new width of this component (in pixels)
-    public void setWidth(int width) {
+    protected void setWidth(int width) {
         // Set the width of this component
         this.width = width;
 
@@ -155,7 +162,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param height the new height of this component (in pixels)
-    public void setHeight(int height) {
+    protected void setHeight(int height) {
         // Set the height of this component
         this.height = height;
 
@@ -172,21 +179,27 @@ public abstract class Component {
         this.boundingBox.setSize(this.width, this.height);
     }
 
+    /// Sets whether the rendering context is clipped to the bounding box when rendering this component.
+    /// @param clipped whether the rendering context is clipped to the bounding box when rendering this component
+    protected void setClipped(boolean clipped) {
+        this.clipped = clipped;
+    }
+
     /// Sets the rendering offset for this component on the x-axis.
     /// @param offsetX the new rendering offset on the x-axis
-    public void setOffsetX(int offsetX) {
+    protected void setOffsetX(int offsetX) {
         this.offsetX = offsetX;
     }
 
     /// Sets the rendering offset for this component on the y-axis.
     /// @param offsetY the new rendering offset on the y-axis
-    public void setOffsetY(int offsetY) {
+    protected void setOffsetY(int offsetY) {
         this.offsetY = offsetY;
     }
 
     /// Sets the widget that contains this component.
     /// @param widget the widget that contains this component
-    public void setWidget(Widget widget) {
+    void setWidget(Widget widget) {
         this.widget = widget;
     }
 
