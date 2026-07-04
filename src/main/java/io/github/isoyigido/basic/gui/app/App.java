@@ -1,6 +1,7 @@
 package io.github.isoyigido.basic.gui.app;
 
 import java.awt.*;
+import java.util.Objects;
 
 /// Stores application appearance.
 ///
@@ -36,8 +37,11 @@ public final class App {
 
     /// Sets the color profile of the application to the given color profile.
     /// @param colorProfile the new color profile to be set
+    /// @throws NullPointerException if the input `colorProfile` is null
     /// @see ColorProfile
     public static void setColorProfile(ColorProfile colorProfile) {
+        Objects.requireNonNull(colorProfile, "Color profile cannot be null.");
+
         App.colorProfile = colorProfile;
     }
 
@@ -58,8 +62,11 @@ public final class App {
 
     /// Sets the text font of the application to the given text font.
     /// @param font the new text font to be set
+    /// @throws NullPointerException if the input `font` is null
     /// @see Font
     public static void setFont(Font font) {
+        Objects.requireNonNull(font, "Application font cannot be null.");
+
         App.font = font;
     }
 }

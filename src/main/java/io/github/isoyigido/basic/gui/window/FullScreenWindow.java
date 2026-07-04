@@ -7,8 +7,8 @@ import java.awt.*;
 /// @see ScreenConfig
 public class FullScreenWindow extends BasicWindow {
     /// Constructs a basic window to be displayed.
-    /// @param title the title of the window
-    /// @param iconImage the icon image of the window
+    /// @param title the title of the window (null for default title)
+    /// @param iconImage the icon image of the window (null for default icon)
     /// @param desiredScreenWidth the desired width for the virtual screen (in pixels)
     /// @param desiredScreenHeight the desired height for the virtual screen (in pixels)
     /// @apiNote The desired screen width and height should adhere to a common aspect ratio.

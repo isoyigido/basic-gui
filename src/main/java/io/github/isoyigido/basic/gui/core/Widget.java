@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /// Represents a displayable widget that contains a {@link Component} object.
 /// Forwards the rendering, update, and input event methods to the contained {@link Component} object.
@@ -77,7 +78,10 @@ public final class Widget {
     /// @param anchorX the x-coordinate of the anchor point on the screen
     /// @param anchorY the y-coordinate of the anchor point on the screen
     /// @param anchor the point on the widget anchored to the anchor point
+    /// @throws NullPointerException if the input `component` is null
     private Widget(Component component, int anchorX, int anchorY, Anchor anchor) {
+        Objects.requireNonNull(component, "Contained component cannot be null.");
+
         // Set the widget containing the component to this
         component.setWidget(this);
 
@@ -169,7 +173,10 @@ public final class Widget {
     /// Sorts the given list of widgets based on their layer indices,
     /// where the widget with the smallest layer index appears first on the list.
     /// @param widgets the list of widgets to sort
+    /// @throws NullPointerException if the input `widgets` is null
     static void sortBasedOnLayerIndex(List<Widget> widgets) {
+        Objects.requireNonNull(widgets, "List of widgets to sort cannot be null.");
+
         // Sort the widgets based on their layer indices
         widgets.sort(Comparator.comparingInt(Widget::getLayerIndex));
     }

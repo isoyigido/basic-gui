@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /// Stores translations. The language can be changed using {@link #setLanguage(String, String)} to load a JSON file containing translations. The stored translations can be accessed using {@link #get(String)}.
@@ -40,7 +41,10 @@ public final class Translator {
     ///
     /// @param key the translation key
     /// @return the translated text
+    /// @throws NullPointerException if the input `key` is null
     public static String get(String key) {
+        Objects.requireNonNull(key, "Translation key cannot be null.");
+
         // If no translation has been loaded, return the key
         if (translationMap == null) return key;
 
@@ -57,7 +61,11 @@ public final class Translator {
     /// Sets the language based on the given language code.
     /// @param directory the relative path to the directory that holds the language files in the resources folder (e.g., `/app/language`)
     /// @param languageCode the language code (e.g., `en`)
+    /// @throws NullPointerException if the input `directory` or `languageCode` is null
     public static void setLanguage(String directory, String languageCode) {
+        Objects.requireNonNull(directory, "Directory to load translations from cannot be null.");
+        Objects.requireNonNull(languageCode, "Language code cannot be null.");
+
         // Load the translations for the given language code
         loadTranslations(directory, languageCode).ifPresent(translations -> {
             // Set the language code

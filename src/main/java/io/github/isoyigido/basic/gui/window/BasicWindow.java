@@ -40,8 +40,8 @@ public class BasicWindow {
     private final boolean preserveNativeAspectRatio;
 
     /// Constructs a basic window to be displayed.
-    /// @param title the title of the window
-    /// @param iconImage the icon image of the window
+    /// @param title the title of the window (null for default title)
+    /// @param iconImage the icon image of the window (null for default icon)
     /// @param undecorated whether the window is undecorated
     /// @param resizable whether the window is resizable
     /// @param windowWidth the width of the window (in pixels)
@@ -86,8 +86,8 @@ public class BasicWindow {
             // Initialize the JFrame window
             JFrame jFrame = new JFrame();
 
-            // Set the title
-            jFrame.setTitle(this.title);
+            // Set the title if there is one
+            if (this.title != null) jFrame.setTitle(this.title);
 
             // Set the application icon if there is one
             if (this.iconImage != null) jFrame.setIconImage(this.iconImage);

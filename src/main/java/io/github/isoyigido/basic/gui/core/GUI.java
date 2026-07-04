@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /// Represents a base GUI within the GUI framework.
 /// Provides an {@link #addWidget(Widget)} method to add widgets.
@@ -28,9 +29,12 @@ public abstract class GUI {
     /// Adds the given widget to this GUI.
     /// @param widget the widget to be added
     /// @throws UnsupportedOperationException if this GUI has already been compiled
+    /// @throws NullPointerException if the input `widget` is null
     public void addWidget(Widget widget) {
         // If this GUI has already been compiled, throw an unsupported operation exception
         if (this.compiled) throw new UnsupportedOperationException("Cannot add widgets after compilation.");
+
+        Objects.requireNonNull(widget, "Widget to add cannot be null.");
 
         // Set the GUI of the widget to this
         widget.setGUI(this);

@@ -3,6 +3,8 @@ package io.github.isoyigido.basic.gui.main;
 import io.github.isoyigido.basic.gui.core.GUIManager;
 import io.github.isoyigido.basic.gui.window.BasicPanel;
 
+import java.util.Objects;
+
 /// Contains the method {@link #startMainLoop(BasicPanel, int, int)} to start the main rendering and update loop.
 /// @see BasicPanel
 public final class Main {
@@ -18,7 +20,10 @@ public final class Main {
     /// @param panel the panel that is rendered on and updated
     /// @param fps number of frames (render calls) per second
     /// @param ups number of updates (update calls) per second
+    /// @throws NullPointerException if the input `panel` is null
     public static void startMainLoop(BasicPanel panel, int fps, int ups) {
+        Objects.requireNonNull(panel, "Panel cannot be null.");
+
         // On a new thread
         new Thread(() -> {
             // Calculate the nanoseconds per frame and update

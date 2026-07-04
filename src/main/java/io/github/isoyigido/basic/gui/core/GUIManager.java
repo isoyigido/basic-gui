@@ -67,7 +67,10 @@ public final class GUIManager {
 
     /// Sets the panel that holds the GUI manager.
     /// @param panel the {@link BasicPanel} object
+    /// @throws NullPointerException if the input `panel` is null
     public static void setPanel(BasicPanel panel) {
+        Objects.requireNonNull(panel, "Panel to set cannot be null.");
+
         GUIManager.panel = panel;
     }
 
@@ -75,7 +78,6 @@ public final class GUIManager {
     /// @param gui the new GUI that will be set
     /// @throws NullPointerException if the input `gui` is null
     public static void setGUI(GUI gui) {
-        // If the given GUI is null, throw a null pointer exception
         Objects.requireNonNull(gui, "GUI to set is null.");
 
         // Compile the given GUI
@@ -90,7 +92,10 @@ public final class GUIManager {
 
     /// Uses the given supplier to set the current GUI.
     /// @param guiSupplier the supplier for the new GUI that will be set
+    /// @throws NullPointerException if the input `guiSupplier` is null
     public static void setGUI(Supplier<GUI> guiSupplier) {
+        Objects.requireNonNull(guiSupplier, "GUI supplier cannot be null.");
+
         setGUI(guiSupplier.get());
     }
 
@@ -131,7 +136,6 @@ public final class GUIManager {
     /// @param cursor the new mouse cursor
     /// @throws IllegalArgumentException if the input `cursor` is null
     public static void setCursor(Cursor cursor) {
-        // If the given cursor is null, throw a null pointer exception
         Objects.requireNonNull(cursor, "Cursor to be set cannot be null.");
 
         // If a panel is linked and the given cursor to be set
@@ -198,7 +202,10 @@ public final class GUIManager {
 
     /// Adds the given alert to the list of active alerts.
     /// @param alert the alert to add to the list
+    /// @throws NullPointerException if the input `alert` is null
     public static void addAlert(Alert alert) {
+        Objects.requireNonNull(alert, "Alert cannot be null.");
+
         // Set the parent list of the alert
         alert.setParentList(activeAlerts);
 
@@ -209,7 +216,10 @@ public final class GUIManager {
     /// Sets a global key bind. Can be called multiple times with
     /// @param key the character of the bound key
     /// @param action the action that is run when the bound key is pressed
+    /// @throws NullPointerException if the input `action` is null
     public static void setGlobalKeyBind(char key, Runnable action) {
+        Objects.requireNonNull(action, "Key action cannot be null.");
+
         // Put the key-action pair in the map
         globalKeyBinds.put(key, action);
     }

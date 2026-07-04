@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /// Represents a base GUI component within the GUI framework.
 /// Provides rendering, update, and input event methods to be overridden.
@@ -71,7 +72,10 @@ public abstract class Component {
 
     /// Adds the given widget as a child widget of this component.
     /// @param widget the widget to be added as a child to this component
+    /// @throws NullPointerException if the input `widget` is null
     public void addWidget(Widget widget) {
+        Objects.requireNonNull(widget, "Widget to add as a child cannot be null.");
+
         // Add the widget to the list of child widgets
         this.childWidgets.add(widget);
     }

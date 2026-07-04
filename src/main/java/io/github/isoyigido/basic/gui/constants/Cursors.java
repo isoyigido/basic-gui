@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 /// Stores constant cursor types.
@@ -50,7 +51,11 @@ public final class Cursors {
     /// @param hotspotY the y position of the hotspot on the cursor image (`0f` is topmost, `1f` is bottommost)
     /// @return an {@link Optional} containing the custom cursor,
     ///         or an empty {@link Optional} if an {@link IOException} is caught
+    /// @throws NullPointerException if the input `name` or `path` is null
     public static Optional<Cursor> getCustomCursor(String name, String path, float hotspotX, float hotspotY) {
+        Objects.requireNonNull(name, "Name of the custom cursor cannot be null.");
+        Objects.requireNonNull(path, "Path to the cursor image file cannot be null.");
+
         try {
             // Get the default toolkit
             Toolkit toolkit = Toolkit.getDefaultToolkit();
