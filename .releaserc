@@ -11,6 +11,5 @@
     "@semantic-release/github"
   ],
   "tagFormat": "${version}",
-  "preset": "conventionalcommits",
-  "initialReleaseVersion": "0.1.0"
+  "preset": "conventionalcommits"
 }
