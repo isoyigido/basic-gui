@@ -59,7 +59,7 @@ dependencies {
 }
 ```
 
-*Note: Replace RELEASE_TAG with a specific version (e.g., v1.0.0), a branch name followed by -SNAPSHOT (e.g., master-SNAPSHOT), or a specific commit hash.*
+*Note: Replace RELEASE_TAG with a specific version (e.g., v1.0.0), a branch name followed by -SNAPSHOT (e.g., main-SNAPSHOT), or a specific commit hash.*
 
 ## Author
 * **isoyigido** - [GitHub Profile](https://github.com/isoyigido)
