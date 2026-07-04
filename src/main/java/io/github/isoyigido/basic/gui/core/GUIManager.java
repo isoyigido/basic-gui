@@ -129,9 +129,14 @@ public final class GUIManager {
 
     /// Sets the mouse cursor.
     /// @param cursor the new mouse cursor
+    /// @throws IllegalArgumentException if the input `cursor` is null
     public static void setCursor(Cursor cursor) {
-        // If a panel
-        if (panel != null) panel.setCursor(cursor);
+        // If the given cursor is null, throw a null pointer exception
+        Objects.requireNonNull(cursor, "Cursor to be set cannot be null.");
+
+        // If a panel is linked and the given cursor to be set
+        // is different from the current cursor, set the cursor
+        if ((panel != null) && !cursor.equals(getCursor())) panel.setCursor(cursor);
     }
 
     /// Moves the mouse cursor to the given location on the screen.
