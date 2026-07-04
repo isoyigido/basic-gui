@@ -25,7 +25,7 @@ public final class Widget {
     /// The y-coordinate of the anchor point on the screen
     private final int anchorY;
 
-    /// The point on the widget anchored to the anchor point
+    /// The point on this widget anchored to the anchor point
     private final Anchor anchor;
 
     /// The x-coordinate of the top-left corner of this widget
