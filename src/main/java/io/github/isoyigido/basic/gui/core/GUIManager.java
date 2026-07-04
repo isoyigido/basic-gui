@@ -200,6 +200,14 @@ public final class GUIManager {
         GUIManager.overlay = overlay;
     }
 
+    /// Removes the current overlay.
+    /// @apiNote This method is functionally the same as `GUIManager.setOverlay(null)`.
+    ///          Use this method to improve readability.
+    public static void removeOverlay() {
+        // Set the overlay to null
+        GUIManager.setOverlay(null);
+    }
+
     /// Adds the given alert to the list of active alerts.
     /// @param alert the alert to add to the list
     /// @throws NullPointerException if the input `alert` is null
