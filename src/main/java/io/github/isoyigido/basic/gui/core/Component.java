@@ -39,28 +39,23 @@ public abstract class Component {
     /// The list of child widgets of this component
     final List<Widget> childWidgets = new ArrayList<>(4);
 
-    /// Constructs a component with zero dimensions.
-    /// @param clipped whether the rendering context is clipped to the bounding box when rendering the component
-    /// @apiNote This initializes a placeholder component before its size is
-    ///          explicitly set in the constructor of the class that implements this.
-    public Component(boolean clipped) {
-        this(0, 0, clipped);
-    }
-
     /// Constructs a component with the given width and height.
     /// @param width the width of the component (in pixels)
     /// @param height the height of the component (in pixels)
-    /// @param clipped whether the rendering context is clipped to the bounding box when rendering the component
-    public Component(int width, int height, boolean clipped) {
+    public Component(int width, int height) {
         // Set the width and height
         this.width = width;
         this.height = height;
 
         // Update the bounding box
         this.updateBoundingBox();
+    }
 
-        // Set whether to clip the rendering context
-        this.clipped = clipped;
+    /// Constructs a component with zero dimensions.
+    /// @apiNote This initializes a placeholder component before its size is
+    ///          explicitly set in the constructor of the class that implements this.
+    public Component() {
+        this(0, 0);
     }
 
     /// Renders this component onto the given graphics context.

@@ -30,8 +30,6 @@ public class TextComponent extends Component {
     /// @param font the font of the displayed text
     /// @throws NullPointerException if the input `text`, `color`, or `font` is null
     public TextComponent(String text, Color color, Font font) {
-        super(false);
-
         // - Check for null parameters -
         Objects.requireNonNull(text, "Text cannot be null.");
         Objects.requireNonNull(text, "Text color cannot be null.");
