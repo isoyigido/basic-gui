@@ -8,6 +8,7 @@ import java.util.Objects;
 /// Represents a simple text display.
 /// Provides methods for setting the displayed text, the color
 /// of the displayed text, and the font of the displayed text.
+/// @see Component
 public class TextComponent extends Component {
     /// The displayed text
     private String text;
