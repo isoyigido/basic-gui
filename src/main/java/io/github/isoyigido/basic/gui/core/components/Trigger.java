@@ -16,6 +16,9 @@ import java.util.Optional;
 /// setting a special cursor that is shown when hovering over the area,
 /// and externally registering a click.
 /// Can be deactivated to stop performing the actions and showing the special cursor.
+/// @see Component
+/// @see MouseButton
+/// @see Cursors
 public class Trigger extends Component {
     /// Whether this trigger is active
     private boolean active;
