@@ -80,7 +80,7 @@ public abstract class Component {
     /// Adds the given widget as a child widget of this component.
     /// @param widget the widget to be added as a child to this component
     /// @throws NullPointerException if the input `widget` is null
-    protected void addWidget(Widget widget) {
+    public void addWidget(Widget widget) {
         Objects.requireNonNull(widget, "Widget to add as a child cannot be null.");
 
         // Add the widget to the list of child widgets
@@ -145,7 +145,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param width the new width of this component (in pixels)
-    protected void setWidth(int width) {
+    public void setWidth(int width) {
         // Set the width of this component
         this.width = width;
 
@@ -162,7 +162,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param height the new height of this component (in pixels)
-    protected void setHeight(int height) {
+    public void setHeight(int height) {
         // Set the height of this component
         this.height = height;
 
@@ -181,19 +181,19 @@ public abstract class Component {
 
     /// Sets whether the rendering context is clipped to the bounding box when rendering this component.
     /// @param clipped whether the rendering context is clipped to the bounding box when rendering this component
-    protected void setClipped(boolean clipped) {
+    public void setClipped(boolean clipped) {
         this.clipped = clipped;
     }
 
     /// Sets the rendering offset for this component on the x-axis.
     /// @param offsetX the new rendering offset on the x-axis
-    protected void setOffsetX(int offsetX) {
+    public void setOffsetX(int offsetX) {
         this.offsetX = offsetX;
     }
 
     /// Sets the rendering offset for this component on the y-axis.
     /// @param offsetY the new rendering offset on the y-axis
-    protected void setOffsetY(int offsetY) {
+    public void setOffsetY(int offsetY) {
         this.offsetY = offsetY;
     }
 
