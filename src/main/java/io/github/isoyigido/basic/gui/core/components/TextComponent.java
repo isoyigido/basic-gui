@@ -24,7 +24,7 @@ public class TextComponent extends Component {
     /// The y-coordinate of the displayed text
     private int textY;
 
-    /// Constructs a text component.
+    /// Constructs a text component which displays the given text.
     /// @param text the displayed text
     /// @param color the color of the displayed text
     /// @param font the font of the displayed text
