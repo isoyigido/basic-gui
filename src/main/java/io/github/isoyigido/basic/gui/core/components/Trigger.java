@@ -36,7 +36,7 @@ public class Trigger extends Component {
     /// @param width the width of the trigger area
     /// @param height the height of the trigger area
     public Trigger(int width, int height) {
-        super(width, height, false);
+        super(width, height);
 
         this.setActive(true);
     }
