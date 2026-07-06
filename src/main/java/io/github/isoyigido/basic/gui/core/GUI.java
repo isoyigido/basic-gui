@@ -13,7 +13,7 @@ import java.util.Objects;
 /// @see Widget
 /// @see Component
 /// @see GUIManager
-public abstract class GUI {
+public class GUI {
     /// The list of widgets contained in this GUI
     private final List<Widget> widgets = new ArrayList<>(8);
 
