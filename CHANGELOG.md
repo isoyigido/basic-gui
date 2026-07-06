@@ -1,3 +1,13 @@
+## [0.3.0](https://github.com/isoyigido/basic-gui/compare/0.2.0...0.3.0) (2026-07-06)
+
+### Features
+
+* **core:** implement ImageComponent for image rendering ([27d640e](https://github.com/isoyigido/basic-gui/commit/27d640ec8f45b1cf5f7db2cad2851b74704680c2))
+
+### Bug Fixes
+
+* **core:** change some protected methods to public ([5e3b60e](https://github.com/isoyigido/basic-gui/commit/5e3b60e52fae2a05bd560e9578ecc5f50f1d4750))
+
 ## [0.2.0](https://github.com/isoyigido/basic-gui/compare/0.1.0...0.2.0) (2026-07-04)
 
 ### Features
