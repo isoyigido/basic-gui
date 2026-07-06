@@ -6,7 +6,7 @@
 
     <groupId>io.github.isoyigido</groupId>
     <artifactId>basic-gui</artifactId>
-    <version>0.0.1</version>
+    <version>0.3.0</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
