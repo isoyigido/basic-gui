@@ -162,6 +162,12 @@ public final class ImageComponent extends Component {
     private static Optional<BufferedImage> readImageFromResources(String path) {
         Objects.requireNonNull(path, "Path to image file cannot be null.");
 
+        // If the path is empty, throw an illegal argument exception
+        if (path.isEmpty()) throw new IllegalArgumentException("Path to image file cannot be empty.");
+
+        // If the path does not have a leading slash, add it
+        if (path.charAt(0) != '/') path = '/' + path;
+
         // Try to read the image file from the given path
         try (InputStream is = ImageComponent.class.getResourceAsStream(path)) {
             // If the input stream is null
