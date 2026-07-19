@@ -106,8 +106,7 @@ public final class Translator {
                 Gson gson = new Gson();
 
                 // Return an optional containing the JsonObject
-                return Optional.of(gson.fromJson(reader, JsonObject.class));
-
+                return Optional.ofNullable(gson.fromJson(reader, JsonObject.class));
             }
         } catch (IOException e) {
             // Log error
