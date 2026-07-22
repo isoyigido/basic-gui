@@ -44,7 +44,7 @@ public final class Widget {
     private GUI gui = null;
 
     /// Represents anchor points on a widget.
-    private enum Anchor {
+    public enum Anchor {
         /// The center point
         CENTER,
 
@@ -79,7 +79,7 @@ public final class Widget {
     /// @param anchorY the y-coordinate of the anchor point on the screen
     /// @param anchor the point on the widget anchored to the anchor point
     /// @throws NullPointerException if the input `component` is null
-    private Widget(Component component, int anchorX, int anchorY, Anchor anchor) {
+    public Widget(Component component, int anchorX, int anchorY, Anchor anchor) {
         Objects.requireNonNull(component, "Contained component cannot be null.");
 
         // Set the widget containing the component to this
