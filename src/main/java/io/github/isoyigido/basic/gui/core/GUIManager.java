@@ -1,6 +1,7 @@
 package io.github.isoyigido.basic.gui.core;
 
 import io.github.isoyigido.basic.gui.constants.Cursors;
+import io.github.isoyigido.basic.gui.core.loader.GUILoader;
 import io.github.isoyigido.basic.gui.window.BasicPanel;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
 public final class GUIManager {
     /// Private constructor to prevent instantiation
     private GUIManager() {
-        throw new UnsupportedOperationException("Utility cannot be instantiated.");
+        throw new UnsupportedOperationException("Utility class cannot be instantiated.");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(GUIManager.class);
@@ -35,7 +36,7 @@ public final class GUIManager {
     private static BasicPanel panel = null;
 
     /// Empty GUI instance
-    private static final GUI EMPTY_GUI = new GUI(){};
+    private static final GUI EMPTY_GUI = new GUI();
 
     /// The current GUI
     private static GUI currentGUI = EMPTY_GUI;
@@ -97,6 +98,25 @@ public final class GUIManager {
         Objects.requireNonNull(guiSupplier, "GUI supplier cannot be null.");
 
         setGUI(guiSupplier.get());
+    }
+
+    /// Loads and sets the GUI from the GUI file at the given path relative to the resources folder.
+    /// Loads the GUI using {@link GUILoader#load(String)} and sets it using {@link GUIManager#setGUI(GUI)}.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and does nothing if no GUI file exists at the given path,
+    ///   or if an error occurs while loading the GUI file
+    ///
+    /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
+    /// @see GUILoader#load(String)
+    public static void setGUI(String path) {
+        // Load the GUI from the file
+        GUILoader.load(path).ifPresentOrElse(
+                // Set the GUI to it
+                GUIManager::setGUI,
+                // The GUI cannot be loaded -> log warning
+                () -> logger.warn("Unable to load GUI file. path={}", path)
+        );
     }
 
     /// Forwards the render call to the current GUI, the global overlay, and active alerts.
