@@ -1,0 +1,9 @@
+io.github.isoyigido.basic.gui.app
+io.github.isoyigido.basic.gui.constants
+io.github.isoyigido.basic.gui.core
+io.github.isoyigido.basic.gui.core.components
+io.github.isoyigido.basic.gui.core.loader
+io.github.isoyigido.basic.gui.core.loader.parameters
+io.github.isoyigido.basic.gui.core.loader.parameters.numbers
+io.github.isoyigido.basic.gui.main
+io.github.isoyigido.basic.gui.window
