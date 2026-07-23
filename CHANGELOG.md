@@ -1,3 +1,18 @@
+## [0.4.0](https://github.com/isoyigido/basic-gui/compare/0.3.0...0.4.0) (2026-07-23)
+
+### Features
+
+* **core:** implement GUI file parsing and widget builder registry system ([a20f056](https://github.com/isoyigido/basic-gui/commit/a20f056295cb271b47e6cda7a1f4bc424e461484))
+* **core:** implement ImageComponentBuilder and TextComponentBuilder for GUI loading ([f4368ed](https://github.com/isoyigido/basic-gui/commit/f4368ed01fcde841589cfac7ea56a4ee05c8149d))
+* **loader:** implement ColorParameter for parsing color attributes ([30c7d4f](https://github.com/isoyigido/basic-gui/commit/30c7d4f7dac2503e40274d82150efcfa62e0a2af))
+* **loader:** implement FloatParameter for parsing float attributes ([4ec6918](https://github.com/isoyigido/basic-gui/commit/4ec69180b01e4240fa5260439a45ca08348e6edc))
+* **loader:** implement ImageResourceParameter for loading image assets from resources ([a25d3e5](https://github.com/isoyigido/basic-gui/commit/a25d3e5bcee19ebfb4a86bb1392c364603eeb327))
+* **loader:** implement StringParameter for parsing string attributes ([93c13c6](https://github.com/isoyigido/basic-gui/commit/93c13c6a61004a755caec05f97c961549dfcc6fd))
+
+### Bug Fixes
+
+* change Optional.of call to Optional.ofNullable where the argument could be null ([d8e1b05](https://github.com/isoyigido/basic-gui/commit/d8e1b05855a9174b5777573739b03f9fe6595da1))
+
 ## [0.3.0](https://github.com/isoyigido/basic-gui/compare/0.2.0...0.3.0) (2026-07-06)
 
 ### Features
