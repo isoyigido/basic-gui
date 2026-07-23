@@ -75,7 +75,7 @@ import java.util.Optional;
 /// }
 /// ```
 ///
-/// @apiNote Multiple WidgetBuilder} implementations may exist for a single {@link Component} type.
+/// @apiNote Multiple WidgetBuilder implementations may exist for a single {@link Component} type.
 ///          For example, a widget builder of type `img-path` and a widget builder of type `img-resource` could
 ///          both build the same type of image component, while one could load the image from the given path and
 ///          the other from the given path relative to the resources folder. Furthermore, a single {@link WidgetBuilder}
