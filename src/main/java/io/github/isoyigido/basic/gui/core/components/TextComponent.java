@@ -1,9 +1,16 @@
 package io.github.isoyigido.basic.gui.core.components;
 
+import io.github.isoyigido.basic.gui.app.App;
 import io.github.isoyigido.basic.gui.core.Component;
+import io.github.isoyigido.basic.gui.core.loader.RegisterWidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.WidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.parameters.ColorParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.StringParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.FloatParameter;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.Optional;
 
 /// Represents a simple text display.
 /// Provides methods for setting the displayed text, the color
@@ -146,5 +153,51 @@ public class TextComponent extends Component {
     /// @return the font metrics for the font of the displayed text
     public FontMetrics getFontMetrics() {
         return this.fontMetrics;
+    }
+
+    // --- WIDGET BUILDERS ---
+    /// This {@link TextComponent} builder is linked to the component type `text`.
+    ///
+    /// **Required parameters:**
+    /// - `text`: the displayed text ({@linkplain StringParameter})
+    /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
+    /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
+    ///
+    /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
+    @RegisterWidgetBuilder(type = "text")
+    public static final class TextComponentBuilder extends WidgetBuilder {
+        /// Required: the displayed text ({@linkplain StringParameter})
+        private final StringParameter text = new StringParameter();
+
+        /// Required: the color of the displayed text ({@linkplain ColorParameter})
+        private final ColorParameter color = new ColorParameter();
+
+        /// Required: the font size of the displayed text ({@linkplain FloatParameter})
+        private final FloatParameter fontSize = FloatParameter.notNegative();
+
+        /// Constructs a {@link TextComponent} builder.
+        ///
+        /// **Required parameters:**
+        /// - `text`: the displayed text ({@linkplain StringParameter})
+        /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
+        /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
+        public TextComponentBuilder() {
+            // - Add required parameters -
+            super.addRequiredParameter("text", this.text);
+            super.addRequiredParameter("color", this.color);
+            super.addRequiredParameter("font-size", this.fontSize);
+        }
+
+        /// Builds a {@link TextComponent} with the stored text, text color, and font size.
+        /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
+        /// @return an {@link Optional} containing the built {@link TextComponent}
+        @Override
+        protected Optional<Component> buildComponent() {
+            return Optional.of(new TextComponent(
+                    this.text.get(),
+                    this.color.get(),
+                    App.getFont(this.fontSize.get())
+            ));
+        }
     }
 }

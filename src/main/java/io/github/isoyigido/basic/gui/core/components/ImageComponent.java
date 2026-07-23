@@ -1,6 +1,10 @@
 package io.github.isoyigido.basic.gui.core.components;
 
 import io.github.isoyigido.basic.gui.core.Component;
+import io.github.isoyigido.basic.gui.core.loader.RegisterWidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.WidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.parameters.ImageResourceParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.IntegerParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +146,9 @@ public final class ImageComponent extends Component {
     /// @return this
     /// @apiNote This method updates the dimensions of this component as well.
     public ImageComponent setDimensions(int width, int height) {
+        // If the image dimensions are already identical to the given dimensions, do nothing
+        if ((this.image.getWidth() == width) && (this.image.getHeight() == height)) return this;
+
         // Resize and set the image
         this.setImage(ImageComponent.resizeImage(this.image, width, height));
 
@@ -180,7 +187,7 @@ public final class ImageComponent extends Component {
             }
 
             // Read the image from the input stream
-            return Optional.of(ImageIO.read(is));
+            return Optional.ofNullable(ImageIO.read(is));
 
         } catch (IOException e) {
             // Log error
@@ -224,5 +231,65 @@ public final class ImageComponent extends Component {
 
         // Return the resized image
         return newImage;
+    }
+
+    // --- WIDGET BUILDERS ---
+    /// This {@link ImageComponent} builder is linked to the component type `image`.
+    ///
+    /// **Required parameters:**
+    /// - `path`: the path to the image file relative to the resources folder ({@linkplain ImageResourceParameter})
+    ///
+    /// **Optional parameters:**
+    /// - `width`: the width of the image ({@linkplain IntegerParameter}, positive)
+    /// - `height`: the height of the image ({@linkplain IntegerParameter}, positive)
+    ///
+    /// The dimensions of the image match the dimensions of the image file at the given path.
+    /// The optional `width` and `height` parameters overrule the dimensions of the image file.
+    @RegisterWidgetBuilder(type = "image")
+    public static final class ImageComponentBuilder extends WidgetBuilder {
+        /// Required: the path to the image file relative to the resources folder ({@linkplain ImageResourceParameter})
+        private final ImageResourceParameter image = new ImageResourceParameter();
+
+        /// Optional: the width of the image ({@linkplain IntegerParameter}, positive)
+        private final IntegerParameter width = IntegerParameter.positive();
+
+        /// Optional: the height of the image ({@linkplain IntegerParameter}, positive)
+        private final IntegerParameter height = IntegerParameter.positive();
+
+        /// Constructs an {@link ImageComponent} builder.
+        ///
+        /// **Required parameters:**
+        /// - `path`: the path to the image file relative to the resources folder ({@linkplain ImageResourceParameter})
+        ///
+        /// **Optional parameters:**
+        /// - `width`: the width of the image ({@linkplain IntegerParameter}, positive)
+        /// - `height`: the height of the image ({@linkplain IntegerParameter}, positive)
+        public ImageComponentBuilder() {
+            super.addRequiredParameter("path", this.image);
+            super.addOptionalParameter("width", this.width);
+            super.addOptionalParameter("height", this.height);
+        }
+
+        /// Builds an {@link ImageComponent} with the stored image and dimensions.
+        /// @return an {@link Optional} containing the built {@link ImageComponent}
+        @Override
+        protected Optional<Component> buildComponent() {
+            // Get the image
+            BufferedImage image = this.image.get();
+
+            // Get whether there is a custom width and height
+            boolean hasCustomWidth = this.width.isPresent();
+            boolean hasCustomHeight = this.height.isPresent();
+
+            // If there is no custom width and height, return a new ImageComponent with the stored image
+            if (!hasCustomWidth && !hasCustomHeight) return Optional.of(new ImageComponent(image));
+
+            // Get the new dimensions of the image
+            int width = hasCustomWidth ? this.width.get() : image.getWidth();
+            int height = hasCustomHeight ? this.height.get() : image.getHeight();
+
+            // Return a new ImageComponent with the stored image and dimensions
+            return Optional.of(new ImageComponent(image, width, height));
+        }
     }
 }
