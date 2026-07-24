@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /// This utility class provides the static method {@link #load(String)} to load and parse a GUI file from resources.
 /// @see #load(String)
@@ -28,6 +30,17 @@ public final class GUILoader {
     /// This cache maps GUI file resource paths to GUI suppliers to avoid parsing the same file twice.
     private static final Map<String, Supplier<GUI>> cache = new HashMap<>(4);
 
+    /// The regex pattern for constant keys (e.g., `padding`, `text_color_1`)
+    private static final String CONSTANT_KEY_REGEX = "[A-Za-z0-9_]+";
+
+    /// The pattern for constant declaration lines (`key = value`)
+    private static final Pattern CONSTANT_DECLARATION_PATTERN =
+            Pattern.compile("^\\s*(%s)\\s*=\\s*(.+?)\\s*$".formatted(CONSTANT_KEY_REGEX));
+
+    /// The pattern for accessing declared constant values (`${key}`)
+    private static final Pattern CONSTANT_ACCESS_PATTERN =
+            Pattern.compile("\\$\\{(%s)\\}".formatted(CONSTANT_KEY_REGEX));
+
     /// Loads and parses the GUI file at the given path relative to the resources folder.
     /// If the GUI file has been parsed before, uses the cached GUI supplier.
     ///
@@ -38,6 +51,10 @@ public final class GUILoader {
     ///
     /// The structure of a GUI file is shown below:
     /// ```text
+    /// CONSTANTKEY = CONSTANTVALUE
+    /// CONSTANTKEY = CONSTANTVALUE
+    /// ...
+    ///
     /// widgets = [
     ///     WIDGETTYPE {
     ///         PARAMETERKEY: PARAMETERVALUE
@@ -53,16 +70,26 @@ public final class GUILoader {
     /// ]
     /// ```
     /// *Note: Whitespace (except newline characters) can be added anywhere without changing the outcome,
-    ///        so long as it does not break words. Blank lines are skipped by the parser.*
+    ///        so long as it does not break individual arguments. Blank lines are skipped by the parser.*
+    ///
+    /// Constant values can be declared anywhere except inside the widget list. Constants can be declared
+    /// with lines following the format `key = value`, and can be accessed inside a widget declaration
+    /// with the format `${key}`. A constant can only be accessed after it is declared. A constant key can consist
+    /// of lowercase letters, uppercase letters, digits, and an underscore (`_`). There is no character limitation
+    /// for constant values.
     ///
     /// Below is an example for a GUI file `example.gui`:
     /// ```text
+    /// image_path = /gui/images/example.jpg
+    /// text_color = #248D96
+    /// font_size = 20.5
+    ///
     /// widgets = [
     ///     image {
     ///         x: 960
     ///         y: 500
     ///         anchor: center
-    ///         path: /gui/images/example.jpg
+    ///         path: ${image_path}
     ///         width: 256
     ///         height: 256
     ///     }
@@ -71,8 +98,8 @@ public final class GUILoader {
     ///         y: 650
     ///         anchor: top
     ///         text: "Example GUI"
-    ///         color: #248d96
-    ///         font-size: 32
+    ///         color: ${text_color}
+    ///         font-size: ${font_size}
     ///     }
     /// ]
     /// ```
@@ -112,6 +139,9 @@ public final class GUILoader {
             // Initialize the scanner for the GUI file
             Scanner scanner = new Scanner(is);
 
+            // Initialize the map of constants declared in the GUI file
+            final Map<String, String> constants = new HashMap<>(8);
+
             // Initialize the list of widgets declared in the GUI file
             final Collection<Widget> widgets = new ArrayList<>(4);
 
@@ -123,11 +153,27 @@ public final class GUILoader {
                 // If the line is blank, skip it
                 if (line.isBlank()) continue;
 
-                // Line declares a widget list -> parse the widgets and add them to the list of widgets
-                if (line.matches("^widgets\\s*=\\s*\\[")) widgets.addAll(parseWidgets(scanner));
+                // - Line declares a widget list -
+                if (line.matches("^widgets\\s*=\\s*\\[")) {
+                    // Parse and add declared widgets
+                    widgets.addAll(parseWidgets(scanner, constants));
+
+                    // Continue
+                    continue;
+                }
+
+                // - Line declares a constant -
+                Matcher matcher = CONSTANT_DECLARATION_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    // Put constant key and value pair into map
+                    constants.put(matcher.group(1), matcher.group(2));
+
+                    // Continue
+                    continue;
+                }
 
                 // Line has an unidentified expression -> log warning
-                else logger.warn("Encountered unidentified expression in GUI file. line={}", line);
+                logger.warn("Encountered unidentified expression in GUI file. line={}", line);
             }
 
             // Put the path and GUI supplier in the cache
@@ -154,8 +200,9 @@ public final class GUILoader {
     ///   without concluding the widget list
     ///
     /// @param scanner the GUI file scanner (reader)
+    /// @param constants the map of constants declared in the GUI file
     /// @return the list of widgets
-    private static List<Widget> parseWidgets(Scanner scanner) {
+    private static List<Widget> parseWidgets(Scanner scanner, Map<String, String> constants) {
         // Initialize the list of widgets declared in the widget list
         final List<Widget> widgets = new ArrayList<>(4);
 
@@ -178,7 +225,7 @@ public final class GUILoader {
                 // Get the corresponding widget builder instance from the widget builder registry
                 WidgetBuilderRegistry.get(type).ifPresentOrElse(
                         // Parse the widget declaration using the registered widget builder instance
-                        widgetBuilder -> parseWidget(widgetBuilder, scanner).ifPresent(widgets::add),
+                        widgetBuilder -> parseWidget(widgetBuilder, scanner, constants).ifPresent(widgets::add),
                         () -> {
                             // Log warning
                             logger.warn("Unknown component type. type={}", type);
@@ -212,13 +259,14 @@ public final class GUILoader {
     ///
     /// @param widgetBuilder the new {@link WidgetBuilder} instance for building the {@link Widget}
     /// @param scanner the GUI file scanner (reader)
+    /// @param constants the map of constants declared in the GUI file
     /// @return an {@link Optional} containing the built widget,
     ///         or an empty {@link Optional} if the {@link WidgetBuilder} instance returns an empty {@link Optional}
-    private static Optional<Widget> parseWidget(WidgetBuilder widgetBuilder, Scanner scanner) {
+    private static Optional<Widget> parseWidget(WidgetBuilder widgetBuilder, Scanner scanner, Map<String, String> constants) {
         // Iterate over the lines
         while (scanner.hasNextLine()) {
-            // Read the line and remove surrounding whitespace
-            String line = scanner.nextLine().strip();
+            // Read the line, remove surrounding whitespace, and resolve constants
+            String line = resolveConstants(scanner.nextLine().strip(), constants);
 
             // If the line is blank, continue
             if (line.isBlank()) continue;
@@ -251,6 +299,55 @@ public final class GUILoader {
 
         // Build and return the widget
         return widgetBuilder.build();
+    }
+
+    /// Resolves constant values in the given line by replacing constant access strings with corresponding values.
+    /// Logs a warning and keeps the constant access string unchanged if an undefined constant key is encountered.
+    ///
+    /// **Format:** `${key}` -> `value`
+    ///
+    /// **Examples:**
+    /// - `x: ${padding}` -> `x: 32`
+    /// - `color: ${text_color_1}` -> `color: #248D96`
+    /// - `label: ${button_label}` -> `label: "Settings"`
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and keeps the constant access string unchanged if an undefined constant key is encountered
+    ///   (e.g., `x: ${padding}` is kept as `x: ${padding}` if `padding` is undefined)
+    ///
+    /// @param line the original line
+    /// @param constants the map of constants declared in the GUI file
+    /// @return the resolved line
+    private static String resolveConstants(CharSequence line, Map<String, String> constants) {
+        // Get the matcher for the constant access pattern
+        Matcher matcher = CONSTANT_ACCESS_PATTERN.matcher(line);
+
+        // Initialize a new StringBuilder instance
+        StringBuilder sb = new StringBuilder(line.length());
+
+        // Iterate over each constant access
+        while (matcher.find()) {
+            // Get the key for the constant
+            String key = matcher.group(1);
+
+            // If a constant has been declared with the key
+            if (constants.containsKey(key)) {
+                // Replace the constant access string with the value of the declared constant
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(constants.get(key)));
+            } else {
+                // Log warning
+                logger.warn("Encountered undefined constant. value={}", key);
+
+                // Keep the constant access string unchanged
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
+            }
+        }
+
+        // Append any remaining text after the last constant access
+        matcher.appendTail(sb);
+
+        // Return the resolved string
+        return sb.toString();
     }
 
     /// Builds a new {@link GUI} instance with the given widgets.
