@@ -3,6 +3,7 @@ package io.github.isoyigido.basic.gui.core.loader;
 import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.Widget;
 import io.github.isoyigido.basic.gui.core.loader.parameters.AnchorParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.BooleanParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.IntegerParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import java.util.Optional;
 /// using {@link #setParameterValue(String, String)}.
 ///
 /// The default parameterless constructor adds `x`, `y`, and `anchor` required parameters;
-/// and `layer` optional parameter.
+/// and `show` and `layer` optional parameters.
 ///
 /// To allow usage in {@link GUILoader}, subclasses of this class must be annotated with {@link RegisterWidgetBuilder}.
 /// Subclasses of this class annotated with {@link RegisterWidgetBuilder} are registered statically in {@link WidgetBuilderRegistry}.
@@ -109,10 +110,14 @@ public abstract class WidgetBuilder {
     /// The point on the widget anchored to the coordinates (required)
     protected final AnchorParameter anchor = new AnchorParameter();
 
+    /// Whether the widget is initially visible (optional)
+    protected final BooleanParameter visibility = new BooleanParameter();
+
     /// The layer index of the widget (optional)
     protected final IntegerParameter layerIndex = new IntegerParameter();
 
-    /// Adds the default required parameters `x`, `y`, and `anchor`; and the optional parameter `layer`.
+    /// Adds the default required parameters `x`, `y`, and `anchor`;
+    /// and the default optional parameters `show` and `layer`.
     /// @see #addRequiredParameter(String, Parameter)
     /// @see #addOptionalParameter(String, Parameter)
     protected WidgetBuilder() {
@@ -121,7 +126,8 @@ public abstract class WidgetBuilder {
         this.addRequiredParameter("y", this.y);
         this.addRequiredParameter("anchor", this.anchor);
 
-        // Add optional layer index parameter
+        // Add optional parameters (show, layer)
+        this.addOptionalParameter("show", this.visibility);
         this.addOptionalParameter("layer", this.layerIndex);
     }
 
@@ -218,6 +224,9 @@ public abstract class WidgetBuilder {
         return this.buildComponent()
                 .flatMap(component -> this.anchor.getWidget(component, this.x.get(), this.y.get()))
                 .map(widget -> {
+                    // Set the visibility of the widget if the visibility parameter has a set value
+                    this.visibility.getOptional().ifPresent(widget::setVisible);
+
                     // Set the layer index of the widget if the layer index parameter has a set value
                     this.layerIndex.getOptional().ifPresent(widget::setLayerIndex);
 
