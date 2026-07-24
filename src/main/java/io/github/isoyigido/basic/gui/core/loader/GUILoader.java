@@ -103,7 +103,6 @@ public final class GUILoader {
         // If the GUI file is already in cache, use cached GUI supplier
         if (cache.containsKey(path)) return Optional.of(cache.get(path).get());
 
-        System.out.println(path);
         // - GUI file is not in cache -> load, parse, and cache the GUI file -
         // Get the GUI file from the resources as a stream
         try (InputStream is = GUILoader.class.getResourceAsStream(path)) {
