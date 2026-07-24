@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Supplier;
 
 /// This utility class provides the static method {@link #load(String)} to load and parse a GUI file from resources.
 /// @see #load(String)
@@ -24,7 +25,11 @@ public final class GUILoader {
 
     private static final Logger logger = LoggerFactory.getLogger(GUILoader.class);
 
+    /// This cache maps GUI file resource paths to GUI suppliers to avoid parsing the same file twice.
+    private static final Map<String, Supplier<GUI>> cache = new HashMap<>(4);
+
     /// Loads and parses the GUI file at the given path relative to the resources folder.
+    /// If the GUI file has been parsed before, uses the cached GUI supplier.
     ///
     /// **GUI file structure:**
     ///
@@ -95,6 +100,11 @@ public final class GUILoader {
         // If the path does not have a leading slash, add it
         if (path.charAt(0) != '/') path = '/' + path;
 
+        // If the GUI file is already in cache, use cached GUI supplier
+        if (cache.containsKey(path)) return Optional.of(cache.get(path).get());
+
+        System.out.println(path);
+        // - GUI file is not in cache -> load, parse, and cache the GUI file -
         // Get the GUI file from the resources as a stream
         try (InputStream is = GUILoader.class.getResourceAsStream(path)) {
             // If there is no GUI file at the given resource path, return empty optional
@@ -120,6 +130,9 @@ public final class GUILoader {
                 // Line has an unidentified expression -> log warning
                 else logger.warn("Encountered unidentified expression in GUI file. line={}", line);
             }
+
+            // Put the path and GUI supplier in the cache
+            cache.put(path, () -> build(widgets));
 
             // Build the GUI and return an optional containing it
             return Optional.of(build(widgets));
