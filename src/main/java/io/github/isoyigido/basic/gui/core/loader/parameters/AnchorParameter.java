@@ -1,6 +1,5 @@
 package io.github.isoyigido.basic.gui.core.loader.parameters;
 
-import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.Widget;
 import io.github.isoyigido.basic.gui.core.loader.Parameter;
 import org.slf4j.Logger;
@@ -57,19 +56,5 @@ public class AnchorParameter extends Parameter<Widget.Anchor> {
                 yield null;
             }
         });
-    }
-
-    /// Returns the right {@link Widget} based on the stored {@link Widget.Anchor} value.
-    /// @param component the {@link Component} stored in the returned {@link Widget}
-    /// @param x the x-coordinate of the anchor point
-    /// @param y the y-coordinate of the anchor point
-    /// @return an {@link Optional} containing the new {@link Widget} anchored to the stored {@link Widget.Anchor},
-    ///         or an empty {@link Optional} if this parameter has no valid set value
-    public Optional<Widget> getWidget(Component component, int x, int y) {
-        // If this parameter has no set value, return empty optional
-        if (super.isEmpty()) return Optional.empty();
-
-        // Return an optional containing the new Widget instance
-        return Optional.of(new Widget(component, x, y, super.get()));
     }
 }

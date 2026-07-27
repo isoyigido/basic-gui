@@ -2,8 +2,8 @@ package io.github.isoyigido.basic.gui.core.components;
 
 import io.github.isoyigido.basic.gui.app.App;
 import io.github.isoyigido.basic.gui.core.Component;
-import io.github.isoyigido.basic.gui.core.loader.RegisterWidgetBuilder;
-import io.github.isoyigido.basic.gui.core.loader.WidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.ComponentBuilder;
+import io.github.isoyigido.basic.gui.core.loader.RegisterComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.parameters.ColorParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.StringParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.FloatParameter;
@@ -155,7 +155,7 @@ public class TextComponent extends Component {
         return this.fontMetrics;
     }
 
-    // --- WIDGET BUILDERS ---
+    // --- COMPONENT BUILDERS ---
     /// This {@link TextComponent} builder is linked to the component type `text`.
     ///
     /// **Required parameters:**
@@ -164,8 +164,8 @@ public class TextComponent extends Component {
     /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
     ///
     /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
-    @RegisterWidgetBuilder(type = "text")
-    public static final class TextComponentBuilder extends WidgetBuilder {
+    @RegisterComponentBuilder(type = "text")
+    public static final class TextComponentBuilder extends ComponentBuilder {
         /// Required: the displayed text ({@linkplain StringParameter})
         private final StringParameter text = new StringParameter();
 
@@ -192,7 +192,7 @@ public class TextComponent extends Component {
         /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
         /// @return an {@link Optional} containing the built {@link TextComponent}
         @Override
-        protected Optional<Component> buildComponent() {
+        protected Optional<Component> build() {
             return Optional.of(new TextComponent(
                     this.text.get(),
                     this.color.get(),
