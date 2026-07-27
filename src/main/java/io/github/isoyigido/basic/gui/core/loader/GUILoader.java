@@ -1,5 +1,6 @@
 package io.github.isoyigido.basic.gui.core.loader;
 
+import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.GUI;
 import io.github.isoyigido.basic.gui.core.Widget;
 import org.slf4j.Logger;
@@ -14,11 +15,12 @@ import java.util.regex.Pattern;
 
 /// This utility class provides the static method {@link #load(String)} to load and parse a GUI file from resources.
 /// @see #load(String)
-/// @see WidgetBuilder
-/// @see WidgetBuilderRegistry
+/// @see ComponentBuilder
+/// @see ComponentBuilderRegistry
 /// @see Parameter
 /// @see GUI
 /// @see Widget
+/// @see Component
 public final class GUILoader {
     /// Private constructor to prevent instantiation
     private GUILoader() {
@@ -30,31 +32,37 @@ public final class GUILoader {
     /// This cache maps GUI file resource paths to GUI suppliers to avoid parsing the same file twice.
     private static final Map<String, Supplier<GUI>> cache = new HashMap<>(4);
 
+    // --- REGEX PATTERNS ---
     /// The regex pattern for component types (e.g., `image`, `custom_button`)
     private static final String COMPONENT_TYPE_REGEX = "[A-Za-z0-9_-]+";
 
-    /// The regex pattern for widget names (e.g., `logo_image`, `button_1`)
-    private static final String WIDGET_NAME_REGEX = "[A-Za-z0-9_-]+";
-
-    /// The pattern for declaring widgets (`widgettype {` or `widgetname = widgettype {`)
-    private static final Pattern WIDGET_DECLARATION_PATTERN
-            = Pattern.compile("^\\s*(?:(%s)\\s*=\\s*)?(%s)\\s*\\{\\s*$".formatted(WIDGET_NAME_REGEX, COMPONENT_TYPE_REGEX));
-
-    /// The pattern for accessing widget attributes (`@{widgetname.attributekey}`)
-    private static final Pattern WIDGET_ATTRIBUTE_ACCESS_PATTERN
-            = Pattern.compile("@\\{(%s).(.+?)}".formatted(WIDGET_NAME_REGEX));
+    /// The regex pattern for component names (e.g., `logo_image`, `button_1`)
+    private static final String COMPONENT_NAME_REGEX = "[A-Za-z0-9_-]+";
 
     /// The regex pattern for parameter keys (e.g., `label`, `color_1`)
     private static final String PARAMETER_KEY_REGEX = "[A-Za-z0-9_-]+";
 
-    /// The pattern for declaring parameters (`parameterkey: parametervalue`)
+    /// The regex pattern for constant keys (e.g., `padding`, `text_color_1`)
+    private static final String CONSTANT_KEY_REGEX = "[A-Za-z0-9_-]+";
+
+    // --- PATTERNS ---
+    /// The pattern for declaring components (`name = type {`)
+    private static final Pattern COMPONENT_DECLARATION_PATTERN
+            = Pattern.compile("^\\s*(%s)\\s*=\\s*(%s)\\s*\\{\\s*$".formatted(COMPONENT_NAME_REGEX, COMPONENT_TYPE_REGEX));
+
+    /// The pattern for declaring widgets (`componentname {`)
+    private static final Pattern WIDGET_DECLARATION_PATTERN
+            = Pattern.compile("^\\s*(%s)\\s*\\{\\s*$".formatted(COMPONENT_NAME_REGEX));
+
+    /// The pattern for accessing widget attributes (`@{componentname.attributekey}`)
+    private static final Pattern WIDGET_ATTRIBUTE_ACCESS_PATTERN
+            = Pattern.compile("@\\{(%s).(.+?)}".formatted(COMPONENT_NAME_REGEX));
+
+    /// The pattern for declaring parameters (`key: value`)
     private static final Pattern PARAMETER_DECLARATION_PATTERN
             = Pattern.compile("^\\s*(%s)\\s*:\\s*(.+?)\\s*$".formatted(PARAMETER_KEY_REGEX));
 
-    /// The regex pattern for constant names (e.g., `padding`, `text_color_1`)
-    private static final String CONSTANT_KEY_REGEX = "[A-Za-z0-9_-]+";
-
-    /// The pattern for constant declaration lines (`key = value`)
+    /// The pattern for declaring constants (`key = value`)
     private static final Pattern CONSTANT_DECLARATION_PATTERN
             = Pattern.compile("^\\s*(%s)\\s*=\\s*(.+?)\\s*$".formatted(CONSTANT_KEY_REGEX));
 
@@ -76,13 +84,27 @@ public final class GUILoader {
     /// CONSTANTKEY = CONSTANTVALUE
     /// ...
     ///
-    /// widgets = [
-    ///     WIDGETNAME = WIDGETTYPE {
+    /// components = [
+    ///     COMPONENTNAME = COMPONENTTYPE {
     ///         PARAMETERKEY: PARAMETERVALUE
     ///         PARAMETERKEY: PARAMETERVALUE
     ///         ...
     ///     }
-    ///     WIDGETNAME = WIDGETTYPE {
+    ///     COMPONENTNAME = COMPONENTTYPE {
+    ///         PARAMETERKEY: PARAMETERVALUE
+    ///         PARAMETERKEY: PARAMETERVALUE
+    ///         ...
+    ///     }
+    ///     ...
+    /// ]
+    ///
+    /// widgets = [
+    ///     COMPONENTNAME {
+    ///         PARAMETERKEY: PARAMETERVALUE
+    ///         PARAMETERKEY: PARAMETERVALUE
+    ///         ...
+    ///     }
+    ///     COMPONENTNAME {
     ///         PARAMETERKEY: PARAMETERVALUE
     ///         PARAMETERKEY: PARAMETERVALUE
     ///         ...
@@ -93,11 +115,11 @@ public final class GUILoader {
     /// *Note: Whitespace (except newline characters) can be added anywhere without changing the outcome,
     ///        so long as it does not break individual arguments. Blank lines are skipped by the parser.*
     ///
-    /// Constant values can be declared anywhere except inside the widget list. Constants can be declared
+    /// Constant values do NOT have to be declared at the top of the file. Constants can be declared
     /// with lines following the format `key = value`, and can be accessed inside a widget declaration
-    /// with the format `${key}`. A constant can only be accessed after it is declared. A constant key can consist
-    /// of lowercase letters, uppercase letters, digits, underscores (`_`), and hyphens (`-`). There is no character
-    /// limitation for constant values.
+    /// with the format `${key}`. A constant can only be accessed after it is declared. A constant key
+    /// can consist of lowercase letters, uppercase letters, digits, underscores (`_`), and hyphens (`-`).
+    /// There is no character limitation for constant values.
     ///
     /// Below is an example for a GUI file `example.gui`:
     /// ```text
@@ -105,22 +127,29 @@ public final class GUILoader {
     /// text_color = #248D96
     /// font_size = 20.5
     ///
-    /// widgets = [
+    /// components = [
     ///     example_image = image {
-    ///         x: 960
-    ///         y: 500
-    ///         anchor: center
     ///         path: ${image_path}
     ///         width: 256
     ///         height: 256
     ///     }
-    ///     text {
-    ///         x: @{example_image.center.x}
-    ///         y: 650
-    ///         anchor: top
+    ///     example_text = text {
     ///         text: "Example GUI"
     ///         color: ${text_color}
     ///         font-size: ${font_size}
+    ///     }
+    /// ]
+    ///
+    /// widgets = [
+    ///     example_image {
+    ///         x: 960
+    ///         y: 500
+    ///         anchor: center
+    ///     }
+    ///     example_text {
+    ///         x: @{example_image.center.x}
+    ///         y: 650
+    ///         anchor: top
     ///     }
     /// ]
     /// ```
@@ -128,14 +157,10 @@ public final class GUILoader {
     /// the API, or even if they do, their implementations may be different. Check the relevant documentation
     /// for more information.*
     ///
-    /// Widgets may be declared with or without a name. Unnamed widgets are declared with the syntax `widgettype {`.
-    /// Named widgets are declared with the syntax `widgetname = widgettype {`. A widget name can consist of lowercase letters,
-    /// uppercase letters, digits, underscores (`_`), and hyphens (`-`). Naming a widget makes its attributes
-    /// accessible via `@{widgetname.attributekey}`.
+    /// A component name can consist of lowercase letters, uppercase letters, digits, underscores (`_`), and hyphens (`-`).
+    /// Attributes of a declared widget can be accessed via `@{componentname.attributekey}`.
     ///
     /// **Recognized attribute keys:**
-    /// - `width`: the width of the widget
-    /// - `height`: the height of the widget
     /// - `left`: the leftmost x-coordinate of the widget
     /// - `right`: the rightmost x-coordinate of the widget
     /// - `top`: the topmost y-coordinate of the widget
@@ -175,8 +200,8 @@ public final class GUILoader {
             // Initialize the scanner for the GUI file
             Scanner scanner = new Scanner(is);
 
-            // Initialize the map of named widgets in the GUI file
-            final Map<String, Widget> namedWidgets = new HashMap<>(4);
+            // Initialize the map of components declared in the GUI file
+            final Map<String, Component> components = new HashMap<>(4);
 
             // Initialize the map of constants declared in the GUI file
             final Map<String, String> constants = new HashMap<>(4);
@@ -192,10 +217,19 @@ public final class GUILoader {
                 // If the line is blank, skip it
                 if (line.isBlank()) continue;
 
+                // - Line declares a component list -
+                if (line.matches("^components\\s*=\\s*\\[")) {
+                    // Parse components
+                    parseComponents(scanner, components, constants);
+
+                    // Continue
+                    continue;
+                }
+
                 // - Line declares a widget list -
                 if (line.matches("^widgets\\s*=\\s*\\[")) {
                     // Parse and add declared widgets
-                    widgets.addAll(parseWidgets(scanner, namedWidgets, constants));
+                    widgets.addAll(parseWidgets(scanner, components, constants));
 
                     // Continue
                     continue;
@@ -212,7 +246,7 @@ public final class GUILoader {
                 }
 
                 // Line has an unidentified expression -> log warning
-                logger.warn("Encountered unidentified expression in GUI file. line={}", line);
+                logger.warn("Encountered unidentified expression in the GUI file. line={}", line);
             }
 
             // Put the path and GUI supplier in the cache
@@ -230,19 +264,140 @@ public final class GUILoader {
         }
     }
 
+    /// Parses the list of components declared in the component list in the GUI file.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and skips the line if an unidentified expression is encountered
+    /// - Logs a warning and skips the component declaration if an unknown component type is encountered
+    ///
+    /// @param scanner the GUI file scanner (reader)
+    /// @param components the map of components declared in the GUI file (will be updated)
+    /// @param constants the map of constants declared in the GUI file
+    private static void parseComponents(Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
+        // Iterate over the lines of the component list
+        while (scanner.hasNextLine()) {
+            // Read the line and remove surrounding whitespace
+            String line = scanner.nextLine().strip();
+
+            // If the line is blank, skip it
+            if (line.isBlank()) continue;
+
+            // If the line marks the end of the component list, return
+            if ("]".equals(line)) return;
+
+            // Get the matcher for the component declaration pattern
+            Matcher matcher = COMPONENT_DECLARATION_PATTERN.matcher(line);
+
+            // If the pattern does not match
+            if (!matcher.matches()) {
+                // Log warning
+                logger.warn("Encountered unidentified expression while parsing components. line={}", line);
+
+                // Skip the line
+                continue;
+            }
+
+            // Get the type of the component
+            String type = matcher.group(2);
+
+            // Get the corresponding component builder instance from the component builder registry
+            Optional<ComponentBuilder> optionalComponentBuilder = ComponentBuilderRegistry.get(type);
+
+            // If the component type is not registered
+            if (optionalComponentBuilder.isEmpty()) {
+                // Log warning
+                logger.warn("Encountered unknown component type. Skipping the component declaration. type={}", type);
+
+                // Skip lines until this component declaration is over
+                while (scanner.hasNextLine()) {
+                    if (scanner.nextLine().strip().matches("^}\\s*")) break;
+                }
+
+                // Continue with the next line
+                continue;
+            }
+
+            // Get the actual component builder instance and set the map of other components for it
+            ComponentBuilder componentBuilder = optionalComponentBuilder.get().setOtherComponents(components);
+
+            // Parse the component declaration using the registered component builder instance,
+            // and put the component into the map of components
+            parseComponent(componentBuilder, scanner, components, constants)
+                    .ifPresent(component -> components.put(matcher.group(1), component));
+        }
+
+        // - The end of the GUI file is reached without concluding the component list -
+        // Log warning
+        logger.warn("The end of the GUI file has been reached without concluding the component list.");
+    }
+
+    /// Parses and returns the component declared in the GUI file.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and skips the line if an unidentified expression is encountered
+    /// - Logs a warning and returns an empty {@link Optional} if the end of the file is reached
+    ///   without concluding the component declaration
+    ///
+    /// @param componentBuilder the new {@link ComponentBuilder} instance for building the component
+    /// @param scanner the GUI file scanner (reader)
+    /// @param components the map of components declared in the GUI file
+    /// @param constants the map of constants declared in the GUI file
+    /// @return an {@link Optional} containing the built component,
+    ///         or an empty {@link Optional} if the {@link ComponentBuilder} instance returns an empty {@link Optional},
+    ///         or if the end of the file is reached without concluding the component declaration
+    private static Optional<Component> parseComponent(ComponentBuilder componentBuilder, Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
+        // Iterate over the lines of the component declaration
+        while (scanner.hasNextLine()) {
+            // Read the line, remove surrounding whitespace, and resolve widget attributes and constants
+            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), components, constants);
+
+            // If the line is blank, continue
+            if (line.isBlank()) continue;
+
+            // If the line marks the end of the component declaration, build and return the component
+            if ("}".equals(line)) return componentBuilder.buildNewObject();
+
+            // Get the matcher for the parameter declaration pattern
+            Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
+
+            // If the pattern does not match
+            if (!matcher.matches()) {
+                // Log warning
+                logger.warn("Encountered unidentified expression while parsing component. line={}", line);
+
+                // Skip the line
+                continue;
+            }
+
+            // Get the parameter key and value
+            String parameterKey = matcher.group(1);
+            String parameterValue = matcher.group(2);
+
+            // Set the value of the parameter tied to the key
+            componentBuilder.setParameterValue(parameterKey, parameterValue);
+        }
+
+        // - The end of the GUI file is reached without concluding the component declaration -
+        // Log warning
+        logger.warn("The end of the GUI file has been reached without concluding the component declaration.");
+
+        // Return empty optional
+        return Optional.empty();
+    }
+
     /// Parses and returns the list of widgets declared in the widget list in the GUI file.
     ///
     /// **Special cases:**
     /// - Logs a warning and skips the line if an unidentified expression is encountered
-    /// - Logs a warning and skips the widget declaration if an unknown component type is encountered
+    /// - Logs a warning and skips the widget declaration if the component name is not found
     /// - Logs a warning and returns the declared list of widgets if the end of the file is reached
     ///   without concluding the widget list
     ///
     /// @param scanner the GUI file scanner (reader)
-    /// @param namedWidgets the map of named widgets in the GUI file (may be updated)
+    /// @param components the map of components declared in the GUI file
     /// @param constants the map of constants declared in the GUI file
     /// @return the list of widgets
-    private static List<Widget> parseWidgets(Scanner scanner, Map<String, Widget> namedWidgets, Map<String, String> constants) {
+    private static List<Widget> parseWidgets(Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
         // Initialize the list of widgets declared in the widget list
         final List<Widget> widgets = new ArrayList<>(4);
 
@@ -269,16 +424,13 @@ public final class GUILoader {
                 continue;
             }
 
-            // Get the type of the declared component (e.g., button)
-            String type = matcher.group(2);
+            // Get the name of the component
+            String componentName = matcher.group(1);
 
-            // Get the corresponding widget builder instance from the widget builder registry
-            Optional<WidgetBuilder> optionalWidgetBuilder = WidgetBuilderRegistry.get(type);
-
-            // If the component type is not registered
-            if (optionalWidgetBuilder.isEmpty()) {
+            // If the map of components does not contain a component with the given name
+            if (!components.containsKey(componentName)) {
                 // Log warning
-                logger.warn("Unknown component type. type={}", type);
+                logger.warn("Encountered undefined component while parsing widgets. name={}", componentName);
 
                 // Skip lines until this widget declaration is over
                 while (scanner.hasNextLine()) {
@@ -289,18 +441,8 @@ public final class GUILoader {
                 continue;
             }
 
-            // Get the actual widget builder instance and set the map of named widgets for it
-            WidgetBuilder widgetBuilder = optionalWidgetBuilder.get().setNamedWidgets(namedWidgets);
-
-            // Parse the widget declaration using the registered widget builder instance
-            parseWidget(widgetBuilder, scanner, namedWidgets, constants).ifPresent(widget -> {
-                // If the widget has a name, put it in the map of named widgets
-                String name = matcher.group(1);
-                if (name != null) namedWidgets.put(name, widget);
-
-                // Add the widget to the list of widgets
-                widgets.add(widget);
-            });
+            // Parse the widget declaration and add the widget to the list
+            parseWidget(components.get(componentName), scanner, components, constants).ifPresent(widgets::add);
         }
 
         // - The end of the GUI file is reached without concluding the widget list -
@@ -318,24 +460,27 @@ public final class GUILoader {
     /// - Logs a warning and returns an empty {@link Optional} if the end of the file is reached
     ///   without concluding the widget declaration
     ///
-    /// @param widgetBuilder the new {@link WidgetBuilder} instance for building the {@link Widget}
+    /// @param component the component stored in the widget
     /// @param scanner the GUI file scanner (reader)
+    /// @param components the map of components declared in the GUI file
     /// @param constants the map of constants declared in the GUI file
-    /// @param namedWidgets the map of named widgets in the GUI file
     /// @return an {@link Optional} containing the built widget,
     ///         or an empty {@link Optional} if the {@link WidgetBuilder} instance returns an empty {@link Optional},
     ///         or if the end of the file is reached without concluding the widget declaration
-    private static Optional<Widget> parseWidget(WidgetBuilder widgetBuilder, Scanner scanner, Map<String, Widget> namedWidgets, Map<String, String> constants) {
-        // Iterate over the lines
+    private static Optional<Widget> parseWidget(Component component, Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
+        // Initialize a new WidgetBuilder instance
+        WidgetBuilder widgetBuilder = new WidgetBuilder(component);
+
+        // Iterate over the lines of the widget declaration
         while (scanner.hasNextLine()) {
             // Read the line, remove surrounding whitespace, and resolve widget attributes and constants
-            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), namedWidgets, constants);
+            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), components, constants);
 
             // If the line is blank, continue
             if (line.isBlank()) continue;
 
             // If the line marks the end of the widget declaration, build and return the widget
-            if ("}".equals(line)) return widgetBuilder.build();
+            if ("}".equals(line)) return widgetBuilder.buildNewObject();
 
             // Get the matcher for the parameter declaration pattern
             Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
@@ -368,32 +513,32 @@ public final class GUILoader {
     /// Uses {@link #resolveWidgetAttributes(CharSequence, Map)} and {@link #resolveConstants(CharSequence, Map)}
     /// to resolve widget attributes and constant values sequentially, and returns the resolved line.
     /// @param line the original line
-    /// @param namedWidgets the map of named widgets in the GUI file
+    /// @param components the map of components declared in the GUI file
     /// @param constants the map of constants declared in the GUI file
     /// @return the resolved line
-    private static String resolveWidgetAttributesAndConstants(CharSequence line, Map<String, Widget> namedWidgets, Map<String, String> constants) {
+    private static String resolveWidgetAttributesAndConstants(CharSequence line, Map<String, Component> components, Map<String, String> constants) {
         // Resolve widget attributes and constant values sequentially
-        return resolveConstants(resolveWidgetAttributes(line, namedWidgets), constants);
+        return resolveConstants(resolveWidgetAttributes(line, components), constants);
     }
 
     /// Resolves widget attributes in the given line by replacing widget attribute access strings with corresponding values.
-    /// Logs a warning and keeps the widget attribute access string unchanged if an undefined widget name or an unrecognized
+    /// Logs a warning and keeps the widget attribute access string unchanged if an undefined component name or an unrecognized
     /// attribute key is encountered.
     ///
-    /// **Format:** `@{widgetname.attributekey}` -> `value`
+    /// **Format:** `@{componentname.attributekey}` -> `value`
     ///
     /// **Examples:**
     /// - `x: @{image.center.x}` -> `x: 400`
     /// - `y: @{image.bottom}` -> `y: 600`
     ///
     /// **Special cases:**
-    /// - Logs a warning and keeps the widget attribute access string unchanged if an undefined widget name
+    /// - Logs a warning and keeps the widget attribute access string unchanged if an undefined component name
     ///   or an unrecognized attribute key is encountered
     ///
     /// @param line the original line
-    /// @param namedWidgets the map of named widgets in the GUI file
+    /// @param components the map of components declared in the GUI file
     /// @return the resolved line
-    private static String resolveWidgetAttributes(CharSequence line, Map<String, Widget> namedWidgets) {
+    private static String resolveWidgetAttributes(CharSequence line, Map<String, Component> components) {
         // Get the matcher for the widget attribute access pattern
         Matcher matcher = WIDGET_ATTRIBUTE_ACCESS_PATTERN.matcher(line);
 
@@ -402,13 +547,28 @@ public final class GUILoader {
 
         // Iterate over each widget attribute access
         while (matcher.find()) {
-            // Get the name of the widget
+            // Get the name of the component
             String name = matcher.group(1);
 
-            // If no widget has been declared with the name
-            if (!namedWidgets.containsKey(name)) {
+            // If no component has been declared with the name
+            if (!components.containsKey(name)) {
                 // Log warning
-                logger.warn("Encountered undefined widget name. value={}", name);
+                logger.warn("Encountered undefined component while trying to access widget attribute. name={}", name);
+
+                // Keep the widget attribute access string unchanged
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
+
+                // Continue with the next occurrence
+                continue;
+            }
+
+            // Get the widget which the component with the given name is stored in
+            Widget widget = components.get(name).getWidget();
+
+            // If the component is not stored in a widget
+            if (widget == null) {
+                // Log warning
+                logger.warn("Cannot access attributes of a component that is not stored in a widget. name={}", name);
 
                 // Keep the widget attribute access string unchanged
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
@@ -421,7 +581,7 @@ public final class GUILoader {
             String attributeKey = matcher.group(2);
 
             // Get the attribute of the named widget based on the attribute key
-            getWidgetAttribute(namedWidgets.get(name), attributeKey).ifPresentOrElse(
+            getWidgetAttribute(widget, attributeKey).ifPresentOrElse(
                     // Replace the widget attribute access string with the attribute value
                     attribute -> matcher.appendReplacement(sb, Matcher.quoteReplacement(attribute)),
                     () -> {
@@ -445,8 +605,6 @@ public final class GUILoader {
     /// or an empty {@link Optional} if the given attribute key is unrecognized.
     ///
     /// **Recognized attribute keys:**
-    /// - `width`: the width of the widget
-    /// - `height`: the height of the widget
     /// - `left`: the leftmost x-coordinate of the widget
     /// - `right`: the rightmost x-coordinate of the widget
     /// - `top`: the topmost y-coordinate of the widget
@@ -455,14 +613,12 @@ public final class GUILoader {
     /// - `center.y`: the y-coordinate of the widget center
     ///
     /// @param widget the widget whose attribute is returned
-    /// @param attributeKey the attribute key (e.g., `width`)
+    /// @param attributeKey the attribute key
     /// @return an {@link Optional} containing the widget attribute string,
     ///         or an empty {@link Optional} if the given attribute key is unrecognized
     private static Optional<String> getWidgetAttribute(Widget widget, String attributeKey) {
         // Get the attribute integer based on the attribute key
         Integer value = switch (attributeKey) {
-            case "width"    -> widget.getComponent().getWidth();
-            case "height"   -> widget.getComponent().getHeight();
             case "left"     -> widget.getX();
             case "center.x" -> widget.getX() + (widget.getComponent().getWidth() / 2);
             case "right"    -> widget.getX() + widget.getComponent().getWidth();
@@ -535,7 +691,7 @@ public final class GUILoader {
         // Initialize a new GUI instance
         GUI gui = new GUI();
 
-        // Add loaded widgets
+        // Add declared widgets
         widgets.forEach(gui::addWidget);
 
         // Return the GUI

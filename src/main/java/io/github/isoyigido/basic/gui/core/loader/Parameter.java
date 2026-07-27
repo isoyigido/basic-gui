@@ -34,11 +34,11 @@ import java.util.Optional;
 ///          for an integer parameter. The {@link #parse(String)} method implementation should log a warning
 ///          and return an empty {@link Optional} if the input value is invalid in any way (e.g., out-of-bounds integer).
 /// @param <T> the object type of the value contained in this parameter
-/// @see WidgetBuilder
+/// @see Builder
 /// @see GUILoader
 public abstract class Parameter<T> {
     /// The value of this parameter (null indicates that no value is set)
-    protected T value = null;
+    private T value = null;
 
     /// Returns the non-null value of this parameter.
     /// @return the non-null value of this parameter

@@ -1,8 +1,8 @@
 package io.github.isoyigido.basic.gui.core.components;
 
 import io.github.isoyigido.basic.gui.core.Component;
-import io.github.isoyigido.basic.gui.core.loader.RegisterWidgetBuilder;
-import io.github.isoyigido.basic.gui.core.loader.WidgetBuilder;
+import io.github.isoyigido.basic.gui.core.loader.ComponentBuilder;
+import io.github.isoyigido.basic.gui.core.loader.RegisterComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.parameters.ImageResourceParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.IntegerParameter;
 import org.slf4j.Logger;
@@ -233,7 +233,7 @@ public final class ImageComponent extends Component {
         return newImage;
     }
 
-    // --- WIDGET BUILDERS ---
+    // --- COMPONENT BUILDERS ---
     /// This {@link ImageComponent} builder is linked to the component type `image`.
     ///
     /// **Required parameters:**
@@ -245,8 +245,8 @@ public final class ImageComponent extends Component {
     ///
     /// The dimensions of the image match the dimensions of the image file at the given path.
     /// The optional `width` and `height` parameters overrule the dimensions of the image file.
-    @RegisterWidgetBuilder(type = "image")
-    public static final class ImageComponentBuilder extends WidgetBuilder {
+    @RegisterComponentBuilder(type = "image")
+    public static final class ImageComponentBuilder extends ComponentBuilder {
         /// Required: the path to the image file relative to the resources folder ({@linkplain ImageResourceParameter})
         private final ImageResourceParameter image = new ImageResourceParameter();
 
@@ -273,7 +273,7 @@ public final class ImageComponent extends Component {
         /// Builds an {@link ImageComponent} with the stored image and dimensions.
         /// @return an {@link Optional} containing the built {@link ImageComponent}
         @Override
-        protected Optional<Component> buildComponent() {
+        protected Optional<Component> build() {
             // Get the image
             BufferedImage image = this.image.get();
 
