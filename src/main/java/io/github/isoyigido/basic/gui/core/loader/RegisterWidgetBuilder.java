@@ -12,6 +12,9 @@ import java.lang.annotation.Target;
 /// {@link WidgetBuilder} subclass. The {@link GUILoader} class uses the {@link WidgetBuilderRegistry}
 /// to get the right {@link WidgetBuilder} instance for a given component type.
 ///
+/// A component type name can consist of lowercase letters, uppercase letters, digits, underscores (`_`),
+/// and hyphens (`-`).
+///
 /// **Example usage:** \
 /// In the example below, the widgets of type `button` in the GUI file
 /// will use a new instance of `ButtonBuilder` for creation.
