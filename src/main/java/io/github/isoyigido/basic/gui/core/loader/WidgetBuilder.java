@@ -4,6 +4,7 @@ import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.Widget;
 import io.github.isoyigido.basic.gui.core.loader.parameters.AnchorParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.BooleanParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.WidgetParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.IntegerParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,9 @@ public abstract class WidgetBuilder {
 
     /// Maps keys to optional parameters.
     private final Map<String, Parameter<?>> optionalParameters = new LinkedHashMap<>(4);
+
+    /// The map of named widgets (null indicates that no map is set)
+    private Map<String, Widget> namedWidgets = null;
 
     /// The x-coordinate of the widget anchor point (required)
     protected final IntegerParameter x = new IntegerParameter();
@@ -249,4 +253,27 @@ public abstract class WidgetBuilder {
     ///          of both, the implementation would return an empty {@link Optional} and preferably log a warning.
     /// @see Component
     protected abstract Optional<Component> buildComponent();
+
+    /// Sets the map of named widgets.
+    /// @param namedWidgets the map of named widgets
+    /// @return this
+    /// @apiNote This method is called in {@link GUILoader}. Setting the map of named widgets
+    ///          enables parameter implementations like {@link WidgetParameter} to access
+    ///          other declared widgets.
+    public WidgetBuilder setNamedWidgets(Map<String, Widget> namedWidgets) {
+        // Set the map of named widgets
+        this.namedWidgets = namedWidgets;
+
+        // Return this
+        return this;
+    }
+
+    /// Returns an {@link Optional} containing the map of named widgets,
+    /// or an empty {@link Optional} if no map is set.
+    /// @return an {@link Optional} containing the map of named widgets,
+    ///         or an empty {@link Optional} if no map is set
+    public Optional<Map<String, Widget>> getNamedWidgets() {
+        // Return an optional of the map of named widgets
+        return Optional.ofNullable(this.namedWidgets);
+    }
 }

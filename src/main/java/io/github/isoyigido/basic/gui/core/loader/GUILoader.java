@@ -294,6 +294,9 @@ public final class GUILoader {
     ///         or an empty {@link Optional} if the {@link WidgetBuilder} instance returns an empty {@link Optional},
     ///         or if the end of the file is reached without concluding the widget declaration
     private static Optional<Widget> parseWidget(WidgetBuilder widgetBuilder, Scanner scanner, Map<String, Widget> namedWidgets, Map<String, String> constants) {
+        // Set the map of named widgets for the widget builder
+        widgetBuilder.setNamedWidgets(namedWidgets);
+
         // Initialize the name of the widget (null indicates no set name)
         String name = null;
 
