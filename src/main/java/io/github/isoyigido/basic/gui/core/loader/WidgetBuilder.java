@@ -135,7 +135,8 @@ public abstract class WidgetBuilder {
         this.addOptionalParameter("layer", this.layerIndex);
     }
 
-    /// Adds a required widget parameter.
+    /// Adds a required widget parameter. The parameter key can consist of lowercase letters,
+    /// uppercase letters, digits, underscores (`_`), and hyphens (`-`).
     /// @param key the key for the parameter in the GUI file (e.g., `color`)
     /// @param parameter the parameter that is effectively tied to the key
     /// @apiNote Required parameters must have a set value. The {@link #build()} method ensures that
@@ -150,7 +151,8 @@ public abstract class WidgetBuilder {
         this.requiredParameters.put(key, parameter);
     }
 
-    /// Adds an optional widget parameter.
+    /// Adds an optional widget parameter. The parameter key can consist of lowercase letters,
+    ///     /// uppercase letters, digits, underscores (`_`), and hyphens (`-`).
     /// @param key the key for the parameter in the GUI file (e.g., `color`)
     /// @param parameter the parameter that is effectively tied to the key
     /// @apiNote Optional parameters may not have a set value. Implementations of {@link #buildComponent()}
