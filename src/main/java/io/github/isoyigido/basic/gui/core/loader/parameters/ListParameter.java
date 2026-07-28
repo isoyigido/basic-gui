@@ -40,6 +40,7 @@ public class ListParameter<T> extends Parameter<List<T>> {
     ///   a pair of surrounding brackets
     /// - Logs a warning and skips any element for which the parser function returns an empty {@link Optional}
     ///
+    /// @param valueString the {@link String} representation of the list
     /// @return an {@link Optional} containing the {@linkplain List} of parsed values,
     ///         or an empty {@link Optional} if the given {@link String} representation does not have a pair of surrounding brackets
     @Override
