@@ -1,5 +1,7 @@
 package io.github.isoyigido.basic.gui.core.loader;
 
+import io.github.isoyigido.basic.gui.core.loader.parameters.ListParameter;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -131,5 +133,14 @@ public abstract class Parameter<T> {
 
         // Return this
         return this;
+    }
+
+    // --- CONVENIENCE ---
+    /// Returns a new {@link ListParameter} instance that uses the {@link #parse(String)} method of this parameter
+    /// as its parser function.
+    /// @return a new {@link ListParameter} instance that uses the {@link #parse(String)} method of this parameter
+    ///         as its parser function
+    public ListParameter<T> toListParameter() {
+        return ListParameter.of(this);
     }
 }

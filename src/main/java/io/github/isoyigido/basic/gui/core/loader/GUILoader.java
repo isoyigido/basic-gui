@@ -348,8 +348,8 @@ public final class GUILoader {
     private static Optional<Component> parseComponent(ComponentBuilder componentBuilder, Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
         // Iterate over the lines of the component declaration
         while (scanner.hasNextLine()) {
-            // Read the line, remove surrounding whitespace, and resolve widget attributes and constants
-            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), components, constants);
+            // Read the line and remove surrounding whitespace
+            String line = scanner.nextLine().strip();
 
             // If the line is blank, continue
             if (line.isBlank()) continue;
@@ -357,24 +357,8 @@ public final class GUILoader {
             // If the line marks the end of the component declaration, build and return the component
             if ("}".equals(line)) return componentBuilder.buildNewObject();
 
-            // Get the matcher for the parameter declaration pattern
-            Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
-
-            // If the pattern does not match
-            if (!matcher.matches()) {
-                // Log warning
-                logger.warn("Encountered unidentified expression while parsing component. line={}", line);
-
-                // Skip the line
-                continue;
-            }
-
-            // Get the parameter key and value
-            String parameterKey = matcher.group(1);
-            String parameterValue = matcher.group(2);
-
-            // Set the value of the parameter tied to the key
-            componentBuilder.setParameterValue(parameterKey, parameterValue);
+            // Parse the parameter declaration
+            parseParameter(componentBuilder, line, scanner, components, constants);
         }
 
         // - The end of the GUI file is reached without concluding the component declaration -
@@ -473,8 +457,8 @@ public final class GUILoader {
 
         // Iterate over the lines of the widget declaration
         while (scanner.hasNextLine()) {
-            // Read the line, remove surrounding whitespace, and resolve widget attributes and constants
-            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), components, constants);
+            // Read the line and remove surrounding whitespace
+            String line = scanner.nextLine().strip();
 
             // If the line is blank, continue
             if (line.isBlank()) continue;
@@ -482,29 +466,85 @@ public final class GUILoader {
             // If the line marks the end of the widget declaration, build and return the widget
             if ("}".equals(line)) return widgetBuilder.buildNewObject();
 
-            // Get the matcher for the parameter declaration pattern
-            Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
-
-            // If the pattern does not match
-            if (!matcher.matches()) {
-                // Log warning
-                logger.warn("Encountered unidentified expression while parsing widget. line={}", line);
-
-                // Skip the line
-                continue;
-            }
-
-            // Get the parameter key and value
-            String parameterKey = matcher.group(1);
-            String parameterValue = matcher.group(2);
-
-            // Set the value of the parameter tied to the key
-            widgetBuilder.setParameterValue(parameterKey, parameterValue);
+            // Parse the parameter declaration
+            parseParameter(widgetBuilder, line, scanner, components, constants);
         }
 
         // - The end of the GUI file is reached without concluding the widget declaration -
         // Log warning
         logger.warn("The end of the GUI file has been reached without concluding the widget declaration.");
+
+        // Return empty optional
+        return Optional.empty();
+    }
+
+    /// Parses the parameter declaration and sets the value of the corresponding parameter of the given {@link Builder} instance..
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and does nothing if an unidentified expression is encountered
+    ///
+    /// @param builder the builder whose parameter value is set
+    /// @param line the line which declares the parameter
+    /// @param scanner the GUI file scanner (reader)
+    /// @param components the map of components declared in the GUI file
+    /// @param constants the map of constants declared in the GUI file
+    private static void parseParameter(Builder<?> builder, String line, Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
+        // Remove surrounding whitespace, resolve widget attributes and constants
+        line = resolveWidgetAttributesAndConstants(line.strip(), components, constants);
+
+        // Get the matcher for the parameter declaration pattern
+        Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
+
+        // If the pattern does not match
+        if (!matcher.matches()) {
+            // Log warning
+            logger.warn("Encountered unidentified expression while parsing parameters. line={}", line);
+
+            // Return
+            return;
+        }
+
+        // Get the parameter key and value
+        String key = matcher.group(1);
+        String value = matcher.group(2);
+
+        // Line declares a list parameter -> parse list parameter and set the value of the parameter tied to the key
+        if ("[".equals(value)) parseListParameter(scanner, components, constants)
+                .ifPresent(parsed -> builder.setParameterValue(key, parsed));
+
+        // Line declares a regular parameter -> set the value of the parameter tied to the key
+        else builder.setParameterValue(key, value);
+    }
+
+    /// Parses the list parameter and returns the string where the string representations of the elements are separated by newline characters.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and returns an empty {@link Optional} if the end of the file is reached without concluding the list parameter
+    ///
+    /// @param scanner the GUI file scanner (reader)
+    /// @param components the map of components declared in the GUI file
+    /// @param constants the map of constants declared in the GUI file
+    /// @return an {@link Optional} containing the string where the string representations of the elements are separated by newline characters,
+    ///         or an empty {@link Optional} if the end of the file is reached without concluding the list parameter
+    private static Optional<String> parseListParameter(Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
+        // Initialize a new StringBuilder instance with the opening bracket
+        StringBuilder sb = new StringBuilder("[");
+
+        // Iterate over the lines of the list
+        while (scanner.hasNextLine()) {
+            // Read the line, remove surrounding whitespace, and resolve widget attributes and constants
+            String line = resolveWidgetAttributesAndConstants(scanner.nextLine().strip(), components, constants);
+
+            // Append a newline character and the line to the string builder
+            sb.append('\n').append(line);
+
+            // If the line marks the end of the list, return an optional containing the built string
+            if ("]".equals(line)) return Optional.of(sb.toString());
+        }
+
+        // - The end of the GUI file is reached without concluding the list parameter -
+        // Log warning
+        logger.warn("The end of the GUI file has been reached without concluding the list parameter.");
 
         // Return empty optional
         return Optional.empty();
