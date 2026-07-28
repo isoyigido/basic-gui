@@ -1,3 +1,18 @@
+## [0.5.0](https://github.com/isoyigido/basic-gui/compare/0.4.0...0.5.0) (2026-07-28)
+
+### Features
+
+* **loader:** add constant declaration support to GUILoader ([f267bf4](https://github.com/isoyigido/basic-gui/commit/f267bf46510abbb80532cad9ec426abcb12f3923))
+* **loader:** add optional visibility parameter to WidgetBuilder ([f4c0a15](https://github.com/isoyigido/basic-gui/commit/f4c0a15c771f4e6ba439ffbef8f22e709da837a1))
+* **loader:** add support for multi-line list parameters in GUI files ([024de10](https://github.com/isoyigido/basic-gui/commit/024de10c087948cf22acac4a9dc5acd3b758648e))
+* **loader:** add widget attribute access support to GUILoader ([7c21ae0](https://github.com/isoyigido/basic-gui/commit/7c21ae088fc346cade12aca987eac0c724a3252a))
+* **loader:** implement BooleanParameter for parsing boolean attributes ([f6ef80f](https://github.com/isoyigido/basic-gui/commit/f6ef80f123f641e8462152adc7f9254296694cd1))
+* **loader:** implement WidgetParameter for referencing named widgets ([1b8fc08](https://github.com/isoyigido/basic-gui/commit/1b8fc088bc1098a6ededdfcdbf6c69f20d294a6f))
+
+### Performance Improvements
+
+* **loader:** add a cache in GUILoader to avoid parsing the same GUI file twice ([17e1a71](https://github.com/isoyigido/basic-gui/commit/17e1a717ae4a12e5ad4d235b3435bd83f9422eef))
+
 ## [0.4.0](https://github.com/isoyigido/basic-gui/compare/0.3.0...0.4.0) (2026-07-23)
 
 ### Features
