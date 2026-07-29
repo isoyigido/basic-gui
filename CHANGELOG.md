@@ -1,3 +1,9 @@
+## [0.6.0](https://github.com/isoyigido/basic-gui/compare/0.5.0...0.6.0) (2026-07-29)
+
+### Features
+
+* **core:** add GUIRegistry and name-based GUI switching support in GUIManager ([ec67207](https://github.com/isoyigido/basic-gui/commit/ec672078d9014a885dc539dc29718232f5415779))
+
 ## [0.5.0](https://github.com/isoyigido/basic-gui/compare/0.4.0...0.5.0) (2026-07-28)
 
 ### Features
