@@ -1,7 +1,6 @@
 package io.github.isoyigido.basic.gui.core;
 
 import io.github.isoyigido.basic.gui.constants.Cursors;
-import io.github.isoyigido.basic.gui.core.loader.GUILoader;
 import io.github.isoyigido.basic.gui.window.BasicPanel;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public final class GUIManager {
     /// @param gui the new GUI that will be set
     /// @throws NullPointerException if the input `gui` is null
     public static void setGUI(GUI gui) {
-        Objects.requireNonNull(gui, "GUI to set is null.");
+        Objects.requireNonNull(gui, "GUI to set cannot be null.");
 
         // Compile the given GUI
         gui.compile();
@@ -92,30 +91,32 @@ public final class GUIManager {
     }
 
     /// Uses the given supplier to set the current GUI.
-    /// @param guiSupplier the supplier for the new GUI that will be set
-    /// @throws NullPointerException if the input `guiSupplier` is null
-    public static void setGUI(Supplier<GUI> guiSupplier) {
-        Objects.requireNonNull(guiSupplier, "GUI supplier cannot be null.");
+    /// @param supplier the supplier for the new GUI that will be set
+    /// @throws NullPointerException if the input `supplier` is null
+    public static void setGUI(Supplier<GUI> supplier) {
+        Objects.requireNonNull(supplier, "GUI supplier cannot be null.");
 
-        setGUI(guiSupplier.get());
+        // Set the GUI from the supplier
+        setGUI(supplier.get());
     }
 
-    /// Loads and sets the GUI from the GUI file at the given path relative to the resources folder.
-    /// Loads the GUI using {@link GUILoader#load(String)} and sets it using {@link GUIManager#setGUI(GUI)}.
+    /// Gets the GUI supplier registered with the given name using {@link GUIRegistry#get(String)} and sets the GUI
+    /// using {@link GUIManager#setGUI(Supplier)}.
     ///
     /// **Special cases:**
-    /// - Logs a warning and does nothing if no GUI file exists at the given path,
-    ///   or if an error occurs while loading the GUI file
+    /// - Logs a warning and does nothing if the given GUI name is not registered
     ///
-    /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
-    /// @see GUILoader#load(String)
-    public static void setGUI(String path) {
-        // Load the GUI from the file
-        GUILoader.load(path).ifPresentOrElse(
-                // Set the GUI to it
+    /// @param name the registered name of the GUI
+    /// @see GUIRegistry
+    public static void setGUI(String name) {
+        Objects.requireNonNull(name, "GUI name cannot be null.");
+
+        // Get the GUI supplier from the GUI registry
+        GUIRegistry.get(name).ifPresentOrElse(
+                // Set the GUI
                 GUIManager::setGUI,
-                // The GUI cannot be loaded -> log warning
-                () -> logger.warn("Unable to load GUI file. path={}", path)
+                // Log warning
+                () -> logger.warn("Encountered unregistered GUI name. name={}", name)
         );
     }
 

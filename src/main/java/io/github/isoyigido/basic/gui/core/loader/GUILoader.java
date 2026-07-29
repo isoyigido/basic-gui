@@ -71,7 +71,7 @@ public final class GUILoader {
             = Pattern.compile("\\$\\{(%s)\\}".formatted(CONSTANT_KEY_REGEX));
 
     /// Loads and parses the GUI file at the given path relative to the resources folder.
-    /// If the GUI file has been parsed before, uses the cached GUI supplier.
+    /// If the GUI file has been parsed before, returns the cached GUI supplier.
     ///
     /// **GUI file structure:**
     ///
@@ -169,17 +169,17 @@ public final class GUILoader {
     /// - `center.y`: the y-coordinate of the widget center
     ///
     /// **Special cases:**
-    /// - Returns an empty {@link Optional} if the given path does not exist in resources,
-    ///   or if an {@link IOException} is caught
-    /// - Returns a new {@link GUI} instance with no widgets if an empty or unrelated file is at the given path
+    /// - Logs a warning and returns an empty {@link Optional} if the given path does not exist in resources
+    /// - Logs an error and returns an empty {@link Optional} if an {@link IOException} is caught
+    /// - Returns a supplier for a {@link GUI} instance with no widgets if an empty or unrelated file is at the given path
     ///
     /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
-    /// @return an {@link Optional} containing the parsed new {@link GUI} instance,
+    /// @return an {@link Optional} containing the parsed {@link GUI} instance supplier,
     ///         or an empty {@link Optional} if the given path does not exist in resources,
     ///         or if an {@link IOException} is caught
     /// @throws NullPointerException if the input `path` is null
     /// @throws IllegalArgumentException if the input `path` is empty
-    public static Optional<GUI> load(String path) {
+    public static Optional<Supplier<GUI>> load(String path) {
         Objects.requireNonNull(path, "Path cannot be null.");
 
         // If the path is empty, throw an illegal argument exception
@@ -189,13 +189,19 @@ public final class GUILoader {
         if (path.charAt(0) != '/') path = '/' + path;
 
         // If the GUI file is already in cache, use cached GUI supplier
-        if (cache.containsKey(path)) return Optional.of(cache.get(path).get());
+        if (cache.containsKey(path)) return Optional.of(cache.get(path));
 
         // - GUI file is not in cache -> load, parse, and cache the GUI file -
         // Get the GUI file from the resources as a stream
         try (InputStream is = GUILoader.class.getResourceAsStream(path)) {
-            // If there is no GUI file at the given resource path, return empty optional
-            if (is == null) return Optional.empty();
+            // If there is no GUI file at the given resource path
+            if (is == null) {
+                // Log warning
+                logger.warn("Unable to find GUI file. path={}", path);
+
+                // Return empty optional
+                return Optional.empty();
+            }
 
             // Initialize the scanner for the GUI file
             Scanner scanner = new Scanner(is);
@@ -249,11 +255,14 @@ public final class GUILoader {
                 logger.warn("Encountered unidentified expression in the GUI file. line={}", line);
             }
 
-            // Put the path and GUI supplier in the cache
-            cache.put(path, () -> build(widgets));
+            // Get the GUI supplier instance
+            Supplier<GUI> supplier = () -> build(widgets);
 
-            // Build the GUI and return an optional containing it
-            return Optional.of(build(widgets));
+            // Put the path and GUI supplier in the cache
+            cache.put(path, supplier);
+
+            // Return an optional containing the GUI supplier
+            return Optional.of(supplier);
 
         } catch (IOException e) {
             // Log error
@@ -478,7 +487,7 @@ public final class GUILoader {
         return Optional.empty();
     }
 
-    /// Parses the parameter declaration and sets the value of the corresponding parameter of the given {@link Builder} instance..
+    /// Parses the parameter declaration and sets the value of the corresponding parameter of the given {@link Builder} instance.
     ///
     /// **Special cases:**
     /// - Logs a warning and does nothing if an unidentified expression is encountered
