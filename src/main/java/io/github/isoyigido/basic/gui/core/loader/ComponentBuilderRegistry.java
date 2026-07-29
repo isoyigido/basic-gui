@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 /// This registry class statically registers new instance suppliers for {@link ComponentBuilder} subclasses
@@ -124,6 +121,8 @@ public final class ComponentBuilderRegistry {
     /// @see ComponentBuilder
     /// @see Optional
     public static Optional<ComponentBuilder> get(String type) {
+        Objects.requireNonNull(type, "Component type cannot be null.");
+
         // Get the supplier from the map and return the component builder from the supplier
         return Optional.ofNullable(registry.get(type)).flatMap(Supplier::get);
     }
