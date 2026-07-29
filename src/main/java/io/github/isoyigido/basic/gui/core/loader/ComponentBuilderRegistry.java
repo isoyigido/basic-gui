@@ -118,6 +118,7 @@ public final class ComponentBuilderRegistry {
     /// @return an {@link Optional} containing a new {@link ComponentBuilder} instance for the given component type,
     ///         or an empty {@link Optional} if the given component type is not registered, or if the corresponding
     ///         supplier returns an empty {@link Optional}
+    /// @throws NullPointerException if the input `type` is null
     /// @see ComponentBuilder
     /// @see Optional
     public static Optional<ComponentBuilder> get(String type) {
