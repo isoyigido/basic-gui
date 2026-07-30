@@ -3,7 +3,6 @@ package io.github.isoyigido.basic.gui.app;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.isoyigido.basic.gui.main.Main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,11 +85,16 @@ public final class Translator {
     /// @return an {@link Optional} containing the {@link JsonObject} of the translations,
     ///         or an empty {@link Optional} if an {@link IOException} is caught
     private static Optional<JsonObject> loadTranslations(String directory, String languageCode) {
-        // Get the path inside the resources folder
-        String resourcePath = directory + '/' + languageCode + ".json";
+        // If the directory path does not have a leading slash, add it
+        if (!directory.startsWith("/")) directory = '/' + directory;
+
+        // Get the path to the language file inside the resources folder
+        String resourcePath = (directory.charAt(directory.length() - 1) == '/')
+                ? (directory + languageCode + ".json")
+                : (directory + '/' + languageCode + ".json");
 
         // Get the language file as an input stream
-        try (InputStream is = Main.class.getResourceAsStream(resourcePath)) {
+        try (InputStream is = Translator.class.getResourceAsStream(resourcePath)) {
             // If the language file cannot be found
             if (is == null) {
                 // Log error

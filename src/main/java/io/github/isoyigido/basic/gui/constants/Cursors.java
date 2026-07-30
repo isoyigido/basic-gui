@@ -1,7 +1,5 @@
 package io.github.isoyigido.basic.gui.constants;
 
-import io.github.isoyigido.basic.gui.main.Main;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -61,7 +59,7 @@ public final class Cursors {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
 
             // Load the cursor image from the input path
-            URL cursorImageURL = Main.class.getResource(path);
+            URL cursorImageURL = Cursors.class.getResource(path);
 
             // If the cursor image cannot be found
             if (cursorImageURL == null) {
