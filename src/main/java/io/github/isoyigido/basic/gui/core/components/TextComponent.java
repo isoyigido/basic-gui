@@ -5,7 +5,7 @@ import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.loader.ComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.RegisterComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.parameters.ColorParameter;
-import io.github.isoyigido.basic.gui.core.loader.parameters.StringParameter;
+import io.github.isoyigido.basic.gui.core.loader.parameters.TextParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.FloatParameter;
 
 import java.awt.*;
@@ -159,15 +159,15 @@ public class TextComponent extends Component {
     /// This {@link TextComponent} builder is linked to the component type `text`.
     ///
     /// **Required parameters:**
-    /// - `text`: the displayed text ({@linkplain StringParameter})
+    /// - `text`: the displayed text ({@linkplain TextParameter})
     /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
     /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
     ///
     /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
     @RegisterComponentBuilder(type = "text")
     public static final class TextComponentBuilder extends ComponentBuilder {
-        /// Required: the displayed text ({@linkplain StringParameter})
-        private final StringParameter text = new StringParameter();
+        /// Required: the displayed text ({@linkplain TextParameter})
+        private final TextParameter text = new TextParameter();
 
         /// Required: the color of the displayed text ({@linkplain ColorParameter})
         private final ColorParameter color = new ColorParameter();
@@ -178,7 +178,7 @@ public class TextComponent extends Component {
         /// Constructs a {@link TextComponent} builder.
         ///
         /// **Required parameters:**
-        /// - `text`: the displayed text ({@linkplain StringParameter})
+        /// - `text`: the displayed text ({@linkplain TextParameter})
         /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
         /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
         public TextComponentBuilder() {
