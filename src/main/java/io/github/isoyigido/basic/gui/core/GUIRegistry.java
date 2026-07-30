@@ -45,7 +45,7 @@ public final class GUIRegistry {
     ///
     /// **Special cases:**
     /// - Logs a warning and does nothing if {@link GUILoader#load(String)} returns an empty {@link Optional}
-    /// 
+    ///
     /// @param name the GUI name to be registered
     /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
     /// @throws NullPointerException if the input `name` or `path` is null
@@ -67,7 +67,7 @@ public final class GUIRegistry {
     /// under its file name without the extension (e.g., `/gui/menu.gui` is registered under `menu`).
     /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
     /// @throws NullPointerException if the input `path` is null
-    /// @see #register(String, String) 
+    /// @see #register(String, String)
     public static void register(String path) {
         Objects.requireNonNull(path, "Path to GUI file to register cannot be null.");
 
