@@ -1,5 +1,6 @@
 package io.github.isoyigido.basic.gui.core.loader;
 
+import io.github.isoyigido.basic.gui.core.Anchor;
 import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.GUI;
 import io.github.isoyigido.basic.gui.core.Widget;
@@ -686,12 +687,12 @@ public final class GUILoader {
     private static Optional<String> getWidgetAttribute(Widget widget, String attributeKey) {
         // Get the attribute integer based on the attribute key
         Integer value = switch (attributeKey) {
-            case "left"     -> widget.getX();
-            case "center.x" -> widget.getX() + (widget.getComponent().getWidth() / 2);
-            case "right"    -> widget.getX() + widget.getComponent().getWidth();
-            case "top"      -> widget.getY();
-            case "center.y" -> widget.getY() + (widget.getComponent().getHeight() / 2);
-            case "bottom"   -> widget.getY() + widget.getComponent().getHeight();
+            case "left"     -> widget.getX(Anchor.LEFT);
+            case "center.x" -> widget.getX(Anchor.CENTER);
+            case "right"    -> widget.getX(Anchor.RIGHT);
+            case "top"      -> widget.getY(Anchor.TOP);
+            case "center.y" -> widget.getY(Anchor.CENTER);
+            case "bottom"   -> widget.getY(Anchor.BOTTOM);
             default -> null; // unrecognized attribute key
         };
 
