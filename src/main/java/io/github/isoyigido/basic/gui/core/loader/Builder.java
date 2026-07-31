@@ -84,8 +84,10 @@ abstract class Builder<T> {
     /// @see Parameter
     protected void setParameterValue(String key, String valueString) {
         // Find whether the given parameter key is required or optional
-        boolean required = this.requiredParameters.containsKey(key);
-        boolean optional = this.optionalParameters.containsKey(key);
+        Parameter<?> requiredParameter = this.requiredParameters.get(key);
+        Parameter<?> optionalParameter = this.optionalParameters.get(key);
+        boolean required = requiredParameter != null;
+        boolean optional = optionalParameter != null;
 
         // If the given parameter key is neither required nor optional (no parameter with that key)
         if (!required && !optional) {
@@ -97,8 +99,8 @@ abstract class Builder<T> {
         }
 
         // Parse the value string and set the value of the parameter with the given key
-        if (required) this.requiredParameters.get(key).parseAndSet(valueString);
-        if (optional) this.optionalParameters.get(key).parseAndSet(valueString);
+        if (required) requiredParameter.parseAndSet(valueString);
+        if (optional) optionalParameter.parseAndSet(valueString);
     }
 
     /// Builds an object using the stored parameter values.

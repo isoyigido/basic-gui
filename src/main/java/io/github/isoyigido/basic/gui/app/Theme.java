@@ -266,17 +266,23 @@ public final class Theme {
     ///
     /// @param colorThemeName the registered name of the color theme
     public static void setColorTheme(String colorThemeName) {
-        // If the color theme registry contains the given color theme name
-        if (colorThemeRegistry.containsKey(colorThemeName)) {
-            // Set the corresponding color theme
-            colorTheme = colorThemeRegistry.get(colorThemeName);
+        // Get the color theme registered under the given color theme name
+        Map<String, Color> colorTheme = colorThemeRegistry.get(colorThemeName);
 
-            // Update the background color
-            updateBackgroundColor();
+        // If the given color theme name is not registered
+        if (colorTheme == null) {
+            // Log warning
+            logger.warn("Color theme name is not registered. value={}", colorThemeName);
+
+            // Return
+            return;
         }
 
-        // Color theme registry does not contain the given color theme name -> log warning and do nothing
-        else logger.warn("Color theme name is not registered. value={}", colorThemeName);
+        // Set the color theme
+        Theme.colorTheme = colorTheme;
+
+        // Update the background color
+        updateBackgroundColor();
     }
 
     /// Sets the corresponding color for the color key {@value #BACKGROUND_COLOR_KEY} as the background color if present.
@@ -318,8 +324,11 @@ public final class Theme {
             return PLACEHOLDER_COLOR;
         }
 
-        // If the color theme does not contain the color key
-        if (!colorTheme.containsKey(key)) {
+        // Get the corresponding color from the color theme
+        Color color = colorTheme.get(key);
+
+        // If the color theme does not contain the given color key
+        if (color == null) {
             // Log warning
             logger.warn("Color is missing. key={}", key);
 
@@ -327,8 +336,8 @@ public final class Theme {
             return PLACEHOLDER_COLOR;
         }
 
-        // Return the color value
-        return colorTheme.get(key);
+        // Return the color
+        return color;
     }
 
     // --- FONTS ---

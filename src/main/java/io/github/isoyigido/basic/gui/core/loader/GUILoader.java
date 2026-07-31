@@ -439,8 +439,11 @@ public final class GUILoader {
             // Get the name of the component
             String componentName = matcher.group(1);
 
+            // Get the component
+            Component component = components.get(componentName);
+
             // If the map of components does not contain a component with the given name
-            if (!components.containsKey(componentName)) {
+            if (component == null) {
                 // Log warning
                 logger.warn("Encountered undefined component while parsing widgets. name={}", componentName);
 
@@ -454,7 +457,7 @@ public final class GUILoader {
             }
 
             // Parse the widget declaration and add the widget to the list
-            parseWidget(components.get(componentName), scanner, components, constants).ifPresent(widgets::add);
+            parseWidget(component, scanner, components, constants).ifPresent(widgets::add);
         }
 
         // - The end of the GUI file is reached without concluding the widget list -
@@ -618,8 +621,11 @@ public final class GUILoader {
             // Get the name of the component
             String name = matcher.group(1);
 
+            // Get the component
+            Component component = components.get(name);
+
             // If no component has been declared with the name
-            if (!components.containsKey(name)) {
+            if (component == null) {
                 // Log warning
                 logger.warn("Encountered undefined component while trying to access widget attribute. name={}", name);
 
@@ -631,7 +637,7 @@ public final class GUILoader {
             }
 
             // Get the widget which the component with the given name is stored in
-            Widget widget = components.get(name).getWidget();
+            Widget widget = component.getWidget();
 
             // If the component is not stored in a widget
             if (widget == null) {
@@ -732,17 +738,23 @@ public final class GUILoader {
             // Get the key for the constant
             String key = matcher.group(1);
 
-            // If a constant has been declared with the key
-            if (constants.containsKey(key)) {
-                // Replace the constant access string with the value of the declared constant
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(constants.get(key)));
-            } else {
+            // Get the constant value
+            String value = constants.get(key);
+
+            // If no constant has been declared with the key
+            if (value == null) {
                 // Log warning
                 logger.warn("Encountered undefined constant. value={}", key);
 
                 // Keep the constant access string unchanged
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
+
+                // Continue with the next occurrence
+                continue;
             }
+
+            // Replace the constant access string with the value of the declared constant
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(value));
         }
 
         // Append any remaining text after the last constant access
