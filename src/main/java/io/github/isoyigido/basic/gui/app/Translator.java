@@ -1,21 +1,20 @@
 package io.github.isoyigido.basic.gui.app;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import io.github.isoyigido.basic.gui.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
-/// Stores translations. The language can be changed using {@link #setLanguage(String, String)} to load a JSON file containing translations. The stored translations can be accessed using {@link #get(String)}.
+/// Stores translations. Provides the method {@link #register(String, String...)} to register language JSON files
+/// under language codes, and the method {@link #setLanguage(String)} to set the language to the given registered
+/// language code. The set translations can be accessed via {@link #get(String)}, which returns the translated text
+/// for the given translation key.
+/// @see #register(String, String...)
+/// @see #setLanguage(String)
+/// @see #get(String)
 public final class Translator {
     /// Private constructor to prevent instantiation
     private Translator() {
@@ -24,19 +23,74 @@ public final class Translator {
 
     private static final Logger logger = LoggerFactory.getLogger(Translator.class);
 
-    /// The language code of the currently loaded language (e.g., `en`)
-    private static String languageCode = null;
+    /// Maps each registered language code to the corresponding translation map.
+    private static final Map<String, Map<String, String>> languageRegistry = new HashMap<>(4);
 
-    /// The translation map containing the key-value pairs for the translations
-    private static Map<String, String> translationMap = null;
+    /// The currently loaded translation map (null indicates that no translation is loaded)
+    private static Map<String, String> translations = null;
+
+    /// Loads and flattens the language JSON files at the given resource directory. Registers the flattened
+    /// translation maps under the given language codes.
+    ///
+    /// The names of the JSON files should match the given language codes (e.g., `en.json`, `de.json`).
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and skips the language code if no corresponding language file is found, or if the language file
+    ///   cannot be read
+    ///
+    /// @param directory the path to the directory that contains the language files relative to the resources folder (e.g., `/app/language/`)
+    /// @param languageCodes the language codes to be registered (e.g., `en`, `de`)
+    /// @throws NullPointerException if the input `directory` or `languageCodes` is null
+    public static void register(String directory, String... languageCodes) {
+        Objects.requireNonNull(directory, "Path to language directory cannot be null.");
+        Objects.requireNonNull(languageCodes, "Array of language codes cannot be null.");
+
+        // If there is no language code to register, return
+        if (languageCodes.length == 0) return;
+
+        // If the directory path does not have a leading slash, add it
+        // Use startsWith instead of charAt to handle empty path (root)
+        if (!directory.startsWith("/")) directory = '/' + directory;
+
+        // If the directory path does not have a trailing slash, add it
+        if (directory.charAt(directory.length() - 1) != '/') directory += '/';
+
+        // For each language code to register
+        for (String languageCode : languageCodes) {
+            // Get the resource path for the language JSON file
+            String resourcePath = directory + languageCode + ".json";
+
+            // Read and flatten the language JSON file
+            JsonUtils.readFromResources(resourcePath).map(JsonUtils::flatten).ifPresentOrElse(
+                    // Register the translations under the given language code
+                    translations -> languageRegistry.put(languageCode, translations),
+                    // Log warning
+                    () -> logger.warn("Unable to find or read language JSON file. path={}", resourcePath)
+            );
+        }
+    }
+
+    /// Sets the language to the given registered language code by updating the loaded translations.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and does nothing if the given language code is not registered
+    ///
+    /// @param languageCode the registered language code
+    public static void setLanguage(String languageCode) {
+        // Language registry contains the given language code -> set the corresponding translations
+        if (languageRegistry.containsKey(languageCode)) translations = languageRegistry.get(languageCode);
+
+        // Language registry does not contain the given language code -> log warning and do nothing
+        else logger.warn("Language code is not registered. value={}", languageCode);
+    }
 
     /// Returns the translated text for the given translation key.
     ///
     /// Example translation key: `main_menu.buttons.settings.label`
     ///
     /// **Special cases:**
-    /// - Returns the input `key` if no translation has been loaded
-    /// - Returns the input `key` if the translations do not contain it
+    /// - Logs a warning and returns the given translation key if no translation has been set yet,
+    ///   or if the corresponding translation is missing
     ///
     /// @param key the translation key
     /// @return the translated text
@@ -44,119 +98,25 @@ public final class Translator {
     public static String get(String key) {
         Objects.requireNonNull(key, "Translation key cannot be null.");
 
-        // If no translation has been loaded, return the key
-        if (translationMap == null) return key;
+        // If no translation has been set
+        if (translations == null) {
+            // Log warning
+            logger.warn("Cannot access translation because no translation is set. key={}", key);
 
-        // If the translation map contains the key, return the value
-        if (translationMap.containsKey(key)) return translationMap.get(key);
-
-        // Log warning
-        logger.warn("Translation is missing. lang={} key={}", languageCode, key);
-
-        // Return the key
-        return key;
-    }
-
-    /// Sets the language based on the given language code.
-    /// @param directory the relative path to the directory that holds the language files in the resources folder (e.g., `/app/language`)
-    /// @param languageCode the language code (e.g., `en`)
-    /// @throws NullPointerException if the input `directory` or `languageCode` is null
-    public static void setLanguage(String directory, String languageCode) {
-        Objects.requireNonNull(directory, "Directory to load translations from cannot be null.");
-        Objects.requireNonNull(languageCode, "Language code cannot be null.");
-
-        // Load the translations for the given language code
-        loadTranslations(directory, languageCode).ifPresent(translations -> {
-            // Set the language code
-            Translator.languageCode = languageCode;
-
-            // Update the translation map
-            Translator.translationMap = flatten(translations);
-        });
-    }
-
-    /// Loads the translations for the given language code.
-    ///
-    /// **Special cases:**
-    /// - Returns an empty {@link Optional} if an {@link IOException} is caught
-    ///
-    /// @param directory the relative path to the directory that holds the language files in the resources folder (e.g., `/app/language`)
-    /// @param languageCode the language code (e.g., `en`)
-    /// @return an {@link Optional} containing the {@link JsonObject} of the translations,
-    ///         or an empty {@link Optional} if an {@link IOException} is caught
-    private static Optional<JsonObject> loadTranslations(String directory, String languageCode) {
-        // If the directory path does not have a leading slash, add it
-        if (!directory.startsWith("/")) directory = '/' + directory;
-
-        // Get the path to the language file inside the resources folder
-        String resourcePath = (directory.charAt(directory.length() - 1) == '/')
-                ? (directory + languageCode + ".json")
-                : (directory + '/' + languageCode + ".json");
-
-        // Get the language file as an input stream
-        try (InputStream is = Translator.class.getResourceAsStream(resourcePath)) {
-            // If the language file cannot be found
-            if (is == null) {
-                // Log error
-                logger.error("Cannot find language file. path={}", resourcePath);
-
-                // Return empty optional
-                return Optional.empty();
-            }
-
-            // Force the InputStreamReader to read the stream as UTF-8
-            try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                // Use Gson to parse the JSON file
-                Gson gson = new Gson();
-
-                // Return an optional containing the JsonObject
-                return Optional.ofNullable(gson.fromJson(reader, JsonObject.class));
-            }
-        } catch (IOException e) {
-            // Log error
-            logger.error("Unable to read language file. path={}", resourcePath, e);
-
-            // Return empty optional
-            return Optional.empty();
+            // Return the key
+            return key;
         }
-    }
 
-    /// Recursively flattens the given {@link JsonObject} into a {@link HashMap} of key-value pairs.
-    /// @param json the nested JSON object
-    /// @return the {@link HashMap} containing the JSON data
-    private static Map<String, String> flatten(JsonObject json) {
-        // Initialize the hash map
-        Map<String, String> result = new HashMap<>(256);
+        // If the translation map does not contain the translation key
+        if (!translations.containsKey(key)) {
+            // Log warning
+            logger.warn("Translation is missing. key={}", key);
 
-        // Flatten the JSON recursively
-        flatten("", json, result);
+            // Return the key
+            return key;
+        }
 
-        // Return the resulting map
-        return result;
-    }
-
-    /// Recursively flattens the given {@link JsonObject} into the given map.
-    /// @param prefix the prefix for the current scope (e.g., `main_menu.buttons`)
-    /// @param json the nested JSON object
-    /// @param result the map where the flattened key-value pairs are put
-    private static void flatten(String prefix, JsonObject json, Map<String, String> result) {
-        // For each entry in the current JSON scope
-        json.entrySet().forEach(entry ->  {
-            // Get flattened key for the entry
-            String key = prefix.isEmpty() ? entry.getKey() : (prefix + '.' + entry.getKey());
-            // Get the value
-            JsonElement value = entry.getValue();
-
-            // If the value indicates a scope
-            if (value.isJsonObject()) {
-                // Flatten the scope recursively into the given map
-                flatten(key, value.getAsJsonObject(), result);
-            }
-            // Else if the value is a primitive
-            else if (value.isJsonPrimitive()) {
-                // Put the value string to the map
-                result.put(key, value.getAsString());
-            }
-        });
+        // Return the translated text
+        return translations.get(key);
     }
 }
