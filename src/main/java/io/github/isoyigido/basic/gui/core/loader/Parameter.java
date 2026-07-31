@@ -63,6 +63,14 @@ public abstract class Parameter<T> {
         return Optional.ofNullable(this.value);
     }
 
+    /// If this parameter has a set value, returns it. Otherwise, returns `other`.
+    /// @param other the value returned if this parameter does not have a set value
+    /// @return the set value of this parameter, or `other`
+    public T getOrElse(T other) {
+        // Return the value of this parameter, or the given value
+        return this.getOptional().orElse(other);
+    }
+
     /// Sets the value of this parameter.
     /// @param value the new non-null value of this parameter
     /// @return this

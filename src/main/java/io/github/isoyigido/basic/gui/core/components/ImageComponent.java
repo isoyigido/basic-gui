@@ -194,6 +194,9 @@ public final class ImageComponent extends Component {
     private static BufferedImage resizeImage(BufferedImage image, int width, int height) {
         Objects.requireNonNull(image, "Image to resize cannot be null.");
 
+        // If the dimensions of the image already match the desired dimensions, return the image
+        if ((image.getWidth() == width) && (image.getHeight() == height)) return image;
+
         // Fallback to TYPE_INT_ARGB to avoid issues with specialized source types
         int originalImageType = image.getType();
         int imageType = (originalImageType == BufferedImage.TYPE_CUSTOM)
@@ -263,18 +266,11 @@ public final class ImageComponent extends Component {
             // Get the image
             BufferedImage image = this.image.get();
 
-            // Get whether there is a custom width and height
-            boolean hasCustomWidth = this.width.isPresent();
-            boolean hasCustomHeight = this.height.isPresent();
+            // Get the dimensions of the image
+            int width = this.width.getOrElse(image.getWidth());
+            int height = this.height.getOrElse(image.getHeight());
 
-            // If there is no custom width and height, return a new ImageComponent with the stored image
-            if (!hasCustomWidth && !hasCustomHeight) return Optional.of(new ImageComponent(image));
-
-            // Get the new dimensions of the image
-            int width = hasCustomWidth ? this.width.get() : image.getWidth();
-            int height = hasCustomHeight ? this.height.get() : image.getHeight();
-
-            // Return a new ImageComponent with the stored image and dimensions
+            // Return a new ImageComponent with the image and dimensions
             return Optional.of(new ImageComponent(image, width, height));
         }
     }
