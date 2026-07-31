@@ -77,11 +77,20 @@ public final class Translator {
     ///
     /// @param languageCode the registered language code
     public static void setLanguage(String languageCode) {
-        // Language registry contains the given language code -> set the corresponding translations
-        if (languageRegistry.containsKey(languageCode)) translations = languageRegistry.get(languageCode);
+        // Get the translations registered under the given language code
+        Map<String, String> translations = languageRegistry.get(languageCode);
 
-        // Language registry does not contain the given language code -> log warning and do nothing
-        else logger.warn("Language code is not registered. value={}", languageCode);
+        // If the given language code is not registered
+        if (translations == null) {
+            // Log warning
+            logger.warn("Language code is not registered. value={}", languageCode);
+
+            // Return
+            return;
+        }
+
+        // Set the translations
+        Translator.translations = translations;
     }
 
     /// Returns the translated text for the given translation key.
@@ -107,8 +116,11 @@ public final class Translator {
             return key;
         }
 
-        // If the translation map does not contain the translation key
-        if (!translations.containsKey(key)) {
+        // Get the translated text from the translations
+        String translatedText = translations.get(key);
+
+        // If the translation map does not contain the given translation key
+        if (translatedText == null) {
             // Log warning
             logger.warn("Translation is missing. key={}", key);
 
@@ -117,6 +129,6 @@ public final class Translator {
         }
 
         // Return the translated text
-        return translations.get(key);
+        return translatedText;
     }
 }
