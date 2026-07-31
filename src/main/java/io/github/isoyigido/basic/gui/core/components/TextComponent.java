@@ -216,8 +216,8 @@ public class TextComponent extends Component {
         protected Optional<Component> build() {
             // Get the font size and font style
             float fontSize = this.fontSize.get();
-            boolean bold = this.bold.getOptional().orElse(false);
-            boolean italic = this.italic.getOptional().orElse(false);
+            boolean bold = this.bold.getOrElse(false);
+            boolean italic = this.italic.getOrElse(false);
 
             // Get the font of the application
             Font font = Theme.getFont(fontSize, bold, italic);
