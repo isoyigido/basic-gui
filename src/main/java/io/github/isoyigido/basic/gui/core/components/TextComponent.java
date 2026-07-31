@@ -1,6 +1,6 @@
 package io.github.isoyigido.basic.gui.core.components;
 
-import io.github.isoyigido.basic.gui.app.App;
+import io.github.isoyigido.basic.gui.app.Theme;
 import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.loader.ComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.RegisterComponentBuilder;
@@ -163,7 +163,7 @@ public class TextComponent extends Component {
     /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
     /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
     ///
-    /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
+    /// The font of the text is set to the current font of the app ({@link Theme#getFont(float)}).
     @RegisterComponentBuilder(type = "text")
     public static final class TextComponentBuilder extends ComponentBuilder {
         /// Required: the displayed text ({@linkplain TextParameter})
@@ -189,14 +189,14 @@ public class TextComponent extends Component {
         }
 
         /// Builds a {@link TextComponent} with the stored text, text color, and font size.
-        /// The font of the text is set to the current font of the app ({@link App#getFont(float)}).
+        /// The font of the text is set to the current font of the app ({@link Theme#getFont(float)}).
         /// @return an {@link Optional} containing the built {@link TextComponent}
         @Override
         protected Optional<Component> build() {
             return Optional.of(new TextComponent(
                     this.text.get(),
                     this.color.get(),
-                    App.getFont(this.fontSize.get())
+                    Theme.getFont(this.fontSize.get())
             ));
         }
     }

@@ -96,12 +96,14 @@ public final class JsonUtils {
     /// @param json the nested JSON object
     /// @return the {@link HashMap} containing the key-value pairs
     public static Map<String, String> flatten(JsonObject json) {
-        // Flatten the JSON using a parser function that returns the string value
-        return flatten(json, value -> value);
+        // Flatten the JSON using a parser function that keeps the string value unchanged
+        return flatten(json, Optional::of);
     }
 
     /// Flattens the given {@link JsonObject} into a {@link HashMap} of key-value pairs
-    /// using the given parser function to parse string values.
+    /// using the given parser function to parse string values. The given parser function
+    /// should return an empty {@link Optional} and preferably log a warning if the string
+    /// value is invalid in any way.
     ///
     /// **Example:**
     /// ```json
@@ -125,11 +127,14 @@ public final class JsonUtils {
     /// "button.settings" -> new Color(10, 151, 151)
     /// ```
     ///
+    /// **Special cases:**
+    /// - Skips the key-value pair if the parser function returns an empty {@link Optional} for the value
+    ///
     /// @param json the nested JSON object
     /// @param parser the parser function used for parsing the string values
     /// @param <T> the object type of the stored values
     /// @return the {@link HashMap} containing the key-value pairs
-    public static <T> Map<String, T> flatten(JsonObject json, Function<String, T> parser) {
+    public static <T> Map<String, T> flatten(JsonObject json, Function<String, Optional<T>> parser) {
         // Initialize a new map
         Map<String, T> result = new HashMap<>(8);
 
@@ -146,7 +151,7 @@ public final class JsonUtils {
     /// @param parser the parser function used for parsing the string values
     /// @param result the map where the flattened key-value pairs are put
     /// @param <T> the object type of the stored values
-    private static <T> void flatten(String prefix, JsonObject json, Function<String, T> parser, Map<String, T> result) {
+    private static <T> void flatten(String prefix, JsonObject json, Function<String, Optional<T>> parser, Map<String, T> result) {
         // For each entry in the current JSON scope
         json.entrySet().forEach(entry ->  {
             // Get the flattened key for the entry
@@ -164,8 +169,8 @@ public final class JsonUtils {
                 return;
             }
 
-            // Parse the string value and put the key-value pair into the map
-            result.put(key, parser.apply(value.getAsString()));
+            // Parse the string value and put the parsed value into the map if present
+            parser.apply(value.getAsString()).ifPresent(parsed -> result.put(key, parsed));
         });
     }
 }
