@@ -117,9 +117,31 @@ public final class GUIManager {
         );
     }
 
+    /// The default background color
+    public static final Color DEFAULT_BACKGROUND_COLOR = Color.WHITE;
+
+    /// The current background color
+    private static Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
+
+    /// Sets the background color to the given color.
+    /// @param color the new background color
+    /// @throws NullPointerException if the input `color` is null
+    public static void setBackgroundColor(Color color) {
+        Objects.requireNonNull(color, "Background color cannot be null.");
+
+        // Set the background color
+        backgroundColor = color;
+    }
+
     /// Forwards the render call to the current GUI, the global overlay, and active alerts.
     /// @param g the graphics context to render on
     public static void render(Graphics2D g) {
+        // Set the color to the background color
+        g.setColor(backgroundColor);
+
+        // Fill the background with the background color
+        g.fillRect(0, 0, ScreenConfig.screenWidth, ScreenConfig.screenHeight);
+
         // Render the current GUI
         currentGUI.render(g);
 

@@ -1,6 +1,5 @@
 package io.github.isoyigido.basic.gui.window;
 
-import io.github.isoyigido.basic.gui.app.App;
 import io.github.isoyigido.basic.gui.core.GUIManager;
 import io.github.isoyigido.basic.gui.core.KeyboardInputListener;
 import io.github.isoyigido.basic.gui.core.MouseInputListener;
@@ -69,12 +68,6 @@ public class BasicPanel extends JPanel {
     /// @param g the graphics context to render on
     @Override
     public void paintComponent(Graphics g) {
-        // Set the color to the background color of the current color profile
-        this.virtualScreenGraphics.setColor(App.getColorProfile().background().base());
-
-        // Fill the background
-        this.virtualScreenGraphics.fillRect(0, 0, ScreenConfig.screenWidth, ScreenConfig.screenHeight);
-
         // Render the GUI on the virtual screen buffer
         GUIManager.render(this.virtualScreenGraphics);
 
