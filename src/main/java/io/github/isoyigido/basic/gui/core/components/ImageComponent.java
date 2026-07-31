@@ -63,20 +63,6 @@ public final class ImageComponent extends Component {
         g.drawImage(this.image, 0, 0, null);
     }
 
-    /// @apiNote Do not use this method to resize the displayed image.
-    ///          Use {@link #setDimensions(int, int)} instead.
-    @Override
-    public void setWidth(int width) {
-        super.setWidth(width);
-    }
-
-    /// @apiNote Do not use this method to resize the displayed image.
-    ///          Use {@link #setDimensions(int, int)} instead.
-    @Override
-    public void setHeight(int height) {
-        super.setHeight(height);
-    }
-
     // --- FACTORY METHODS ---
     /// Reads the image file at the given path in the resources folder and returns an image component displaying it.
     ///
@@ -133,8 +119,8 @@ public final class ImageComponent extends Component {
         this.image = image;
 
         // Update dimensions
-        this.setWidth(image.getWidth());
-        this.setHeight(image.getHeight());
+        super.setWidth(image.getWidth());
+        super.setHeight(image.getHeight());
 
         // Return this
         return this;
@@ -145,7 +131,7 @@ public final class ImageComponent extends Component {
     /// @param height the new height of the displayed image
     /// @return this
     /// @apiNote This method updates the dimensions of this component as well.
-    public ImageComponent setDimensions(int width, int height) {
+    public ImageComponent resize(int width, int height) {
         // If the image dimensions are already identical to the given dimensions, do nothing
         if ((this.image.getWidth() == width) && (this.image.getHeight() == height)) return this;
 

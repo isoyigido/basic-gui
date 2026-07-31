@@ -140,7 +140,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param width the new width of this component (in pixels)
-    public void setWidth(int width) {
+    protected void setWidth(int width) {
         // Set the width of this component
         this.width = width;
 
@@ -157,7 +157,7 @@ public abstract class Component {
     /// If this component is contained in a widget, the position of the widget is updated as well.
     ///
     /// @param height the new height of this component (in pixels)
-    public void setHeight(int height) {
+    protected void setHeight(int height) {
         // Set the height of this component
         this.height = height;
 
@@ -166,6 +166,15 @@ public abstract class Component {
 
         // If this component is contained in a widget, update its position
         if (this.widget != null) this.widget.updateY();
+    }
+
+    /// Sets the dimensions of this component using {@link #setWidth(int)} and {@link #setHeight(int)}.
+    /// @param width the new width of this component (in pixels)
+    /// @param height the new height of this component (in pixels)
+    protected void setDimensions(int width, int height) {
+        // Set the width and height
+        this.setWidth(width);
+        this.setHeight(height);
     }
 
     /// Updates the bounding box of this component.
