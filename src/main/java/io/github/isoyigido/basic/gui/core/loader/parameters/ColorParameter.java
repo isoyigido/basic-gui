@@ -1,5 +1,6 @@
 package io.github.isoyigido.basic.gui.core.loader.parameters;
 
+import io.github.isoyigido.basic.gui.app.Theme;
 import io.github.isoyigido.basic.gui.core.loader.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,21 +21,15 @@ public class ColorParameter extends Parameter<Color> {
     /// Parses the given {@link String} representation of a color.
     /// If the {@link String} representation consists of individual RGB(A) values, uses {@link #parseRGB(String)}.
     /// If the {@link String} representation represents a hexadecimal value, uses {@link #parseHex(String)}.
+    /// Otherwise, treats the {@link String} representation as a color key and uses {@link Theme#getColor(String)}
+    /// to get the corresponding color.
     ///
-    /// **Valid RGB(A) formats:**
-    /// - `(R, G, B, A)`
-    /// - `(R G B A)`
-    /// - `R, G, B, A`
-    /// - `R G B A`
+    /// **RGB(A) format:** `(R, G, B, A)`
     ///
     /// *Note: The alpha channel (A) is optional, and should be included after the RGB values if present.
     ///        All RGB(A) values must be integers in the range 0-255.*
     ///
-    /// **Valid hexadecimal formats:**
-    /// - `#RRGGBB(AA)`
-    /// - `RRGGBB(AA)`
-    /// - `0xRRGGBB(AA)`
-    /// - `0XRRGGBB(AA)`
+    /// **Hexadecimal format:** `#RRGGBB(AA)`
     ///
     /// *Note: The alpha channel (AA) is optional, and should be included after the RGB bytes if present.
     ///        Both uppercase and lowercase hexadecimal letters (A-F and a-f) are accepted.*
@@ -43,31 +38,29 @@ public class ColorParameter extends Parameter<Color> {
     /// - Logs a warning and returns an empty {@link Optional} if the {@link String} representation is invalid
     ///   or has out-of-bounds RGB(A) values
     ///
-    /// @param valueString the {@link String} representation of the color
+    /// @param valueString the {@link String} representation of the color, or the color key
     /// @return an {@link Optional} containing the parsed {@link Color},
     ///         or an empty {@link Optional} if the {@link String} representation is invalid
     ///         or has out-of-bounds RGB(A) values
-    /// @see #parseRGB(String)
-    /// @see #parseHex(String)
     @Override
     public Optional<Color> parse(String valueString) {
         // Remove surrounding whitespace
         valueString = valueString.strip();
 
-        // If the value string contains a comma or whitespace character, parse individual RGB(A) values
-        if (valueString.matches(".*[\\s,].*")) return ColorParameter.parseRGB(valueString);
+        // If the value string starts with #, parse hexadecimal color value
+        if (valueString.startsWith("#")) return ColorParameter.parseHex(valueString);
 
-        // Parse hexadecimal color value
-        return ColorParameter.parseHex(valueString);
+        // If the value string contains surrounding parentheses, parse individual RGB(A) values
+        if (valueString.startsWith("(") && valueString.endsWith(")")) return ColorParameter.parseRGB(valueString);
+
+        // - Treat the value string as a color key -
+        // Return the corresponding color from the set color theme
+        return Optional.of(Theme.getColor(valueString));
     }
 
     /// Parses the given {@link String} representation of individual RGB(A) values.
     ///
-    /// **Valid formats:**
-    /// - `(R, G, B, A)`
-    /// - `(R G B A)`
-    /// - `R, G, B, A`
-    /// - `R G B A`
+    /// **Format:** `(R, G, B, A)`
     ///
     /// *Note: The alpha channel (A) is optional, and should be included after the RGB values if present.
     ///        All RGB(A) values must be integers in the range 0-255.*
@@ -89,10 +82,8 @@ public class ColorParameter extends Parameter<Color> {
             valueString = valueString.substring(1, valueString.length() - 1).strip();
         }
 
-        // Split the value string by commas or whitespace
-        String[] args = valueString.contains(",")
-                ? valueString.split(",")
-                : valueString.split("\\s+");
+        // Split the value string by commas
+        String[] args = valueString.split(",");
 
         // If there are 4 arguments, there is an alpha channel alongside the RGB channels
         boolean hasAlpha = args.length == 4;
@@ -140,11 +131,7 @@ public class ColorParameter extends Parameter<Color> {
 
     /// Parses the given {@link String} representation of a hexadecimal color value.
     ///
-    /// **Valid formats:**
-    /// - `#RRGGBB(AA)`
-    /// - `RRGGBB(AA)`
-    /// - `0xRRGGBB(AA)`
-    /// - `0XRRGGBB(AA)`
+    /// **Format:** `#RRGGBB(AA)`
     ///
     /// *Note: The alpha channel (AA) is optional, and should be included after the RGB bytes if present.
     ///        Both uppercase and lowercase hexadecimal letters (A-F and a-f) are accepted.*
@@ -155,14 +142,13 @@ public class ColorParameter extends Parameter<Color> {
     /// @param valueString the {@link String} representation of the hexadecimal color value
     /// @return an {@link Optional} containing the parsed {@link Color},
     ///         or an empty {@link Optional} if the {@link String} representation of the hexadecimal value is invalid
-    public static Optional<Color> parseHex(String valueString) {
+    private static Optional<Color> parseHex(String valueString) {
         try {
             // Remove surrounding whitespace and convert to lowercase
             valueString = valueString.strip().toLowerCase();
 
-            // If the hexadecimal string has the prefix # or 0x, remove them
+            // If the hexadecimal string has the prefix #, remove it
             if (valueString.startsWith("#")) valueString = valueString.substring(1);
-            if (valueString.startsWith("0x")) valueString = valueString.substring(2);
 
             // Parse the hexadecimal string to get the unsigned integer color value
             int value = Integer.parseUnsignedInt(valueString, 16);
