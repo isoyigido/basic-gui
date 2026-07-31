@@ -20,13 +20,13 @@ public final class Widget {
     private final Component component;
 
     /// The x-coordinate of the anchor point on the screen
-    private final int anchorX;
+    private int anchorX;
 
     /// The y-coordinate of the anchor point on the screen
-    private final int anchorY;
+    private int anchorY;
 
-    /// The point on this widget anchored to the anchor point
-    private final Anchor anchor;
+    /// The point on this widget anchored to the anchor coordinates
+    private Anchor anchor;
 
     /// The x-coordinate of the top-left corner of this widget
     private int x;
@@ -43,41 +43,11 @@ public final class Widget {
     /// The GUI that contains this widget
     private GUI gui = null;
 
-    /// Represents anchor points on a widget.
-    public enum Anchor {
-        /// The center point
-        CENTER,
-
-        /// The middle-left point
-        LEFT,
-
-        /// The middle-right point
-        RIGHT,
-
-        /// The top-center point
-        TOP,
-
-        /// The bottom-center point
-        BOTTOM,
-
-        /// The top-left corner
-        TOP_LEFT,
-
-        /// The top-right corner
-        TOP_RIGHT,
-
-        /// The bottom-left corner
-        BOTTOM_LEFT,
-
-        /// The bottom-right corner
-        BOTTOM_RIGHT
-    }
-
     /// Constructs a widget that contains the given component and is anchored to the given point on the screen.
     /// @param component the component that is contained in the widget
     /// @param anchorX the x-coordinate of the anchor point on the screen
     /// @param anchorY the y-coordinate of the anchor point on the screen
-    /// @param anchor the point on the widget anchored to the anchor point
+    /// @param anchor the point on the widget anchored to the coordinates
     /// @throws NullPointerException if the input `component` is null
     public Widget(Component component, int anchorX, int anchorY, Anchor anchor) {
         Objects.requireNonNull(component, "Contained component cannot be null.");
@@ -88,36 +58,20 @@ public final class Widget {
         // Set the contained component
         this.component = component;
 
-        // Set anchor point coordinates
-        this.anchorX = anchorX;
-        this.anchorY = anchorY;
-
-        // Set the anchor
-        this.anchor = anchor;
-
-        // Update the position of this widget
-        this.updateX();
-        this.updateY();
+        // Set the position and anchor
+        this.setPosition(anchorX, anchorY, anchor);
     }
 
     /// Updates the x-coordinate of this widget to stay anchored to the anchor point.
     void updateX() {
-        // Set the x-coordinate based on the anchor
-        this.x = switch (this.anchor) {
-            case TOP_LEFT, LEFT, BOTTOM_LEFT    -> this.anchorX;
-            case TOP, CENTER, BOTTOM            -> this.anchorX - (this.component.width / 2);
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> this.anchorX - this.component.width;
-        };
+        // Set the x-coordinate based on the anchor point
+        this.x = this.anchor.getX(this.anchorX, this.component.width);
     }
 
     /// Updates the y-coordinate of this widget to stay anchored to the anchor point.
     void updateY() {
         // Set the y-coordinate based on the anchor point
-        this.y = switch (this.anchor) {
-            case TOP_LEFT, TOP, TOP_RIGHT          -> this.anchorY;
-            case LEFT, CENTER, RIGHT               -> this.anchorY - (this.component.height / 2);
-            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> this.anchorY - this.component.height;
-        };
+        this.y = this.anchor.getY(this.anchorY, this.component.height);
     }
 
     /// Renders the component contained in this widget.
@@ -188,16 +142,18 @@ public final class Widget {
         return this.component;
     }
 
-    /// Returns the x-coordinate of the top-left corner of this widget.
-    /// @return the x-coordinate of the top-left corner of this widget
-    public int getX() {
-        return this.x;
+    /// Returns the x-coordinate of the given anchor point on this widget.
+    /// @param anchor the anchor point
+    /// @return the x-coordinate of the given anchor point on this widget
+    public int getX(Anchor anchor) {
+        return anchor.getAnchorX(this.x, this.component.width);
     }
 
-    /// Returns the y-coordinate of the top-left corner of this widget.
-    /// @return the y-coordinate of the top-left corner of this widget
-    public int getY() {
-        return this.y;
+    /// Returns the y-coordinate of the given anchor point on this widget.
+    /// @param anchor the anchor point
+    /// @return the y-coordinate of the given anchor point on this widget
+    public int getY(Anchor anchor) {
+        return anchor.getAnchorY(this.y, this.component.height);
     }
 
     /// Returns whether this widget is visible.
@@ -219,6 +175,60 @@ public final class Widget {
     }
 
     // --- SETTERS ---
+    /// Sets the x-coordinate of the anchor point of this widget.
+    /// @param anchorX the x-coordinate of the anchor point
+    /// @return this
+    public Widget setX(int anchorX) {
+        // Set the x-coordinate of the anchor point
+        this.anchorX = anchorX;
+
+        // Update the x-coordinate of this widget
+        this.updateX();
+
+        // Return this
+        return this;
+    }
+
+    /// Sets the y-coordinate of the anchor point of this widget.
+    /// @param anchorY the y-coordinate of the anchor point
+    /// @return this
+    public Widget setY(int anchorY) {
+        // Set the y-coordinate of the anchor point
+        this.anchorY = anchorY;
+
+        // Update the y-coordinate of this widget
+        this.updateY();
+
+        // Return this
+        return this;
+    }
+
+    /// Sets the position of the anchor point of this widget.
+    /// @param anchorX the x-coordinate of the anchor point
+    /// @param anchorY the y-coordinate of the anchor point
+    /// @return this
+    public Widget setPosition(int anchorX, int anchorY) {
+        // Set the x and y coordinates
+        this.setX(anchorX);
+        this.setY(anchorY);
+
+        // Return this
+        return this;
+    }
+
+    /// Sets the position of this widget.
+    /// @param anchorX the x-coordinate of the anchor point
+    /// @param anchorY the y-coordinate of the anchor point
+    /// @param anchor the point on the widget anchored to the coordinates
+    /// @return this
+    public Widget setPosition(int anchorX, int anchorY, Anchor anchor) {
+        // Set the anchor point
+        this.anchor = anchor;
+
+        // Set the position of the anchor point
+        return this.setPosition(anchorX, anchorY);
+    }
+
     /// Sets the visibility of this widget.
     /// @param visible whether this widget should be visible
     /// @return this
@@ -230,24 +240,25 @@ public final class Widget {
         return this;
     }
 
+    /// Toggles the visibility of this widget.
+    /// @return this
+    public Widget toggleVisibility() {
+        // Toggle visibility
+        return this.setVisible(!this.visible);
+    }
+
     /// Shows this widget.
     /// @return this
     public Widget show() {
         // Set visibility to true
-        this.setVisible(true);
-
-        // Return this
-        return this;
+        return this.setVisible(true);
     }
 
     /// Hides this widget.
     /// @return this
     public Widget hide() {
         // Set visibility to false
-        this.setVisible(false);
-
-        // Return this
-        return this;
+        return this.setVisible(false);
     }
 
     /// Sets the GUI that contains this widget and its child widgets.
