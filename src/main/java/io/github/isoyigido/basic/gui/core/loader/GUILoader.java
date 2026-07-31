@@ -6,12 +6,16 @@ import io.github.isoyigido.basic.gui.core.Widget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /// This utility class provides the static method {@link #load(String)} to load and parse a GUI file from resources.
 /// @see #load(String)
@@ -28,9 +32,6 @@ public final class GUILoader {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(GUILoader.class);
-
-    /// This cache maps GUI file resource paths to GUI suppliers to avoid parsing the same file twice.
-    private static final Map<String, Supplier<GUI>> cache = new HashMap<>(4);
 
     // --- REGEX PATTERNS ---
     /// The regex pattern for component types (e.g., `image`, `custom_button`)
@@ -70,8 +71,7 @@ public final class GUILoader {
     private static final Pattern CONSTANT_ACCESS_PATTERN
             = Pattern.compile("\\$\\{(%s)\\}".formatted(CONSTANT_KEY_REGEX));
 
-    /// Loads and parses the GUI file at the given path relative to the resources folder.
-    /// If the GUI file has been parsed before, returns the cached GUI supplier.
+    /// Loads the GUI file at the given path relative to the resources folder.
     ///
     /// **GUI file structure:**
     ///
@@ -174,12 +174,29 @@ public final class GUILoader {
     /// - Returns a supplier for a {@link GUI} instance with no widgets if an empty or unrelated file is at the given path
     ///
     /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
-    /// @return an {@link Optional} containing the parsed {@link GUI} instance supplier,
+    /// @return an {@link Optional} containing the loaded {@link GUI} instance supplier,
     ///         or an empty {@link Optional} if the given path does not exist in resources,
     ///         or if an {@link IOException} is caught
     /// @throws NullPointerException if the input `path` is null
     /// @throws IllegalArgumentException if the input `path` is empty
     public static Optional<Supplier<GUI>> load(String path) {
+        // Read and parse the GUI file content, and return the supplier for the GUI
+        return read(path).map(content -> () -> GUILoader.parseContent(content));
+    }
+
+    /// Reads the GUI file at the given path relative to the resources folder, and returns its content.
+    ///
+    /// **Special cases:**
+    /// - Logs a warning and returns an empty {@link Optional} if the given path does not exist in resources
+    /// - Logs an error and returns an empty {@link Optional} if an {@link IOException} is caught
+    ///
+    /// @param path the path to the GUI file relative to the resources folder (e.g., `/gui/menu.gui`)
+    /// @return an {@link Optional} containing the content of the GUI file,
+    ///         or an empty {@link Optional} if the given path does not exist in resources,
+    ///         or if an {@link IOException} is caught
+    /// @throws NullPointerException if the input `path` is null
+    /// @throws IllegalArgumentException if the input `path` is empty
+    private static Optional<String> read(String path) {
         Objects.requireNonNull(path, "Path cannot be null.");
 
         // If the path is empty, throw an illegal argument exception
@@ -188,10 +205,6 @@ public final class GUILoader {
         // If the path does not have a leading slash, add it
         if (path.charAt(0) != '/') path = '/' + path;
 
-        // If the GUI file is already in cache, use cached GUI supplier
-        if (cache.containsKey(path)) return Optional.of(cache.get(path));
-
-        // - GUI file is not in cache -> load, parse, and cache the GUI file -
         // Get the GUI file from the resources as a stream
         try (InputStream is = GUILoader.class.getResourceAsStream(path)) {
             // If there is no GUI file at the given resource path
@@ -203,66 +216,11 @@ public final class GUILoader {
                 return Optional.empty();
             }
 
-            // Initialize the scanner for the GUI file
-            Scanner scanner = new Scanner(is);
-
-            // Initialize the map of components declared in the GUI file
-            final Map<String, Component> components = new HashMap<>(4);
-
-            // Initialize the map of constants declared in the GUI file
-            final Map<String, String> constants = new HashMap<>(4);
-
-            // Initialize the list of widgets declared in the GUI file
-            final Collection<Widget> widgets = new ArrayList<>(4);
-
-            // Parse each line of the GUI file
-            while (scanner.hasNextLine()) {
-                // Read the line and remove surrounding whitespace
-                String line = scanner.nextLine().strip();
-
-                // If the line is blank, skip it
-                if (line.isBlank()) continue;
-
-                // - Line declares a component list -
-                if (line.matches("^components\\s*=\\s*\\[")) {
-                    // Parse components
-                    parseComponents(scanner, components, constants);
-
-                    // Continue
-                    continue;
-                }
-
-                // - Line declares a widget list -
-                if (line.matches("^widgets\\s*=\\s*\\[")) {
-                    // Parse and add declared widgets
-                    widgets.addAll(parseWidgets(scanner, components, constants));
-
-                    // Continue
-                    continue;
-                }
-
-                // - Line declares a constant -
-                Matcher matcher = CONSTANT_DECLARATION_PATTERN.matcher(line);
-                if (matcher.matches()) {
-                    // Put constant key and value pair into map
-                    constants.put(matcher.group(1), matcher.group(2));
-
-                    // Continue
-                    continue;
-                }
-
-                // Line has an unidentified expression -> log warning
-                logger.warn("Encountered unidentified expression in the GUI file. line={}", line);
+            // Get a new BufferedReader instance to read the input stream
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                // Join the lines of the GUI file with newline characters and return the joined string
+                return Optional.of(reader.lines().collect(Collectors.joining("\n")));
             }
-
-            // Get the GUI supplier instance
-            Supplier<GUI> supplier = () -> build(widgets);
-
-            // Put the path and GUI supplier in the cache
-            cache.put(path, supplier);
-
-            // Return an optional containing the GUI supplier
-            return Optional.of(supplier);
 
         } catch (IOException e) {
             // Log error
@@ -271,6 +229,66 @@ public final class GUILoader {
             // Return empty optional
             return Optional.empty();
         }
+    }
+
+    /// Parses the given GUI file content and builds a new {@link GUI} instance.
+    /// @param content the GUI file content
+    /// @return the built {@link GUI} instance
+    private static GUI parseContent(String content) {
+        // Initialize the scanner for the GUI file
+        Scanner scanner = new Scanner(content);
+
+        // Initialize the map of components declared in the GUI file
+        final Map<String, Component> components = new HashMap<>(4);
+
+        // Initialize the map of constants declared in the GUI file
+        final Map<String, String> constants = new HashMap<>(4);
+
+        // Initialize the list of widgets declared in the GUI file
+        final Collection<Widget> widgets = new ArrayList<>(4);
+
+        // Parse each line of the GUI file
+        while (scanner.hasNextLine()) {
+            // Read the line and remove surrounding whitespace
+            String line = scanner.nextLine().strip();
+
+            // If the line is blank, skip it
+            if (line.isBlank()) continue;
+
+            // - Line declares a component list -
+            if (line.matches("^components\\s*=\\s*\\[")) {
+                // Parse components
+                parseComponents(scanner, components, constants);
+
+                // Continue
+                continue;
+            }
+
+            // - Line declares a widget list -
+            if (line.matches("^widgets\\s*=\\s*\\[")) {
+                // Parse and add declared widgets
+                widgets.addAll(parseWidgets(scanner, components, constants));
+
+                // Continue
+                continue;
+            }
+
+            // - Line declares a constant -
+            Matcher matcher = CONSTANT_DECLARATION_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                // Put constant key and value pair into map
+                constants.put(matcher.group(1), matcher.group(2));
+
+                // Continue
+                continue;
+            }
+
+            // Line has an unidentified expression -> log warning
+            logger.warn("Encountered unidentified expression in the GUI file. line={}", line);
+        }
+
+        // Build and return the GUI
+        return build(widgets);
     }
 
     /// Parses the list of components declared in the component list in the GUI file.
