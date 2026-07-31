@@ -4,6 +4,7 @@ import io.github.isoyigido.basic.gui.app.Theme;
 import io.github.isoyigido.basic.gui.core.Component;
 import io.github.isoyigido.basic.gui.core.loader.ComponentBuilder;
 import io.github.isoyigido.basic.gui.core.loader.RegisterComponentBuilder;
+import io.github.isoyigido.basic.gui.core.loader.parameters.BooleanParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.ColorParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.TextParameter;
 import io.github.isoyigido.basic.gui.core.loader.parameters.numbers.FloatParameter;
@@ -163,7 +164,12 @@ public class TextComponent extends Component {
     /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
     /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
     ///
+    /// **Optional parameters:**
+    /// - `bold`: whether the displayed text is bold ({@linkplain BooleanParameter})
+    /// - `italic`: whether the displayed text is italic ({@linkplain BooleanParameter})
+    ///
     /// The font of the text is set to the current font of the app ({@link Theme#getFont(float)}).
+    /// The text is in plain style by default.
     @RegisterComponentBuilder(type = "text")
     public static final class TextComponentBuilder extends ComponentBuilder {
         /// Required: the displayed text ({@linkplain TextParameter})
@@ -175,28 +181,52 @@ public class TextComponent extends Component {
         /// Required: the font size of the displayed text ({@linkplain FloatParameter})
         private final FloatParameter fontSize = FloatParameter.notNegative();
 
+        /// Optional: whether the displayed text is bold ({@linkplain BooleanParameter})
+        private final BooleanParameter bold = new BooleanParameter();
+
+        /// Optional: whether the displayed text is italic ({@linkplain BooleanParameter})
+        private final BooleanParameter italic = new BooleanParameter();
+
         /// Constructs a {@link TextComponent} builder.
         ///
         /// **Required parameters:**
         /// - `text`: the displayed text ({@linkplain TextParameter})
         /// - `color`: the color of the displayed text ({@linkplain ColorParameter})
         /// - `font-size`: the font size of the displayed text ({@linkplain FloatParameter})
+        ///
+        /// **Optional parameters:**
+        /// - `bold`: whether the displayed text is bold ({@linkplain BooleanParameter})
+        /// - `italic`: whether the displayed text is italic ({@linkplain BooleanParameter})
         public TextComponentBuilder() {
             // - Add required parameters -
             super.addRequiredParameter("text", this.text);
             super.addRequiredParameter("color", this.color);
             super.addRequiredParameter("font-size", this.fontSize);
+
+            // - Add optional parameters -
+            super.addOptionalParameter("bold", this.bold);
+            super.addOptionalParameter("italic", this.italic);
         }
 
-        /// Builds a {@link TextComponent} with the stored text, text color, and font size.
+        /// Builds a {@link TextComponent} with the stored text, text color, font size, and font style.
         /// The font of the text is set to the current font of the app ({@link Theme#getFont(float)}).
+        /// The text is in plain style by default.
         /// @return an {@link Optional} containing the built {@link TextComponent}
         @Override
         protected Optional<Component> build() {
+            // Get the font size and font style
+            float fontSize = this.fontSize.get();
+            boolean bold = this.bold.getOptional().orElse(false);
+            boolean italic = this.italic.getOptional().orElse(false);
+
+            // Get the font of the application
+            Font font = Theme.getFont(fontSize, bold, italic);
+
+            // Build and return a new text component
             return Optional.of(new TextComponent(
                     this.text.get(),
                     this.color.get(),
-                    Theme.getFont(this.fontSize.get())
+                    font
             ));
         }
     }
