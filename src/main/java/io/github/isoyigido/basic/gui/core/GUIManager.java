@@ -34,11 +34,8 @@ public final class GUIManager {
     /// The panel linked to the displayed window
     private static BasicPanel panel = null;
 
-    /// Empty GUI instance
-    private static final GUI EMPTY_GUI = new GUI();
-
     /// The current GUI
-    private static GUI currentGUI = EMPTY_GUI;
+    private static GUI currentGUI = null;
 
     /// The current overlay
     private static Overlay overlay = null;
@@ -61,8 +58,8 @@ public final class GUIManager {
             logger.error("Robot could not be initialized.", e);
         }
 
-        // Set the GUI to the empty GUI
-        setGUI(EMPTY_GUI);
+        // Set the GUI to a new empty GUI
+        setGUI(GUI::new);
     }
 
     /// Sets the panel that holds the GUI manager.
