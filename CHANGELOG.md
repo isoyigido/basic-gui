@@ -1,3 +1,20 @@
+## [0.7.0](https://github.com/isoyigido/basic-gui/compare/0.6.0...0.7.0) (2026-08-01)
+
+### Features
+
+* **app:** introduce Theme class for color theme and font management and remove legacy App class ([03279d8](https://github.com/isoyigido/basic-gui/commit/03279d8f65eb15ac18fd36b7fce24b1cc657889b))
+* **loader:** add bold and italic optional parameters to TextComponentBuilder ([96723c4](https://github.com/isoyigido/basic-gui/commit/96723c4feb21b8df71d7c4b79c7682deb6b1bd81))
+* **loader:** introduce TextParameter for literal and translation-key text parsing ([b1cd265](https://github.com/isoyigido/basic-gui/commit/b1cd26526a800305a02dfa5dd0e130827382ebea))
+* **loader:** update ColorParameter to support Theme color keys and streamline parsing rules ([63906b2](https://github.com/isoyigido/basic-gui/commit/63906b268f0a9fdd80f3415ad6bb7855ea46c6a2))
+
+### Bug Fixes
+
+* **loader:** defer GUI building in GUILoader via content caching for dynamic language and appearance updates ([fdd0afd](https://github.com/isoyigido/basic-gui/commit/fdd0afd574272403b614937678c289adea61ad3b))
+
+### Performance Improvements
+
+* optimize map lookups by replacing containsKey checks with null checks ([0ca90d4](https://github.com/isoyigido/basic-gui/commit/0ca90d40a153786e502e2466d4fa84bce219440f))
+
 ## [0.6.0](https://github.com/isoyigido/basic-gui/compare/0.5.0...0.6.0) (2026-07-29)
 
 ### Features
