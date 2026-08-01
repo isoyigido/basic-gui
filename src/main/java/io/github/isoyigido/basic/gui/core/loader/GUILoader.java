@@ -277,8 +277,15 @@ public final class GUILoader {
             // - Line declares a constant -
             Matcher matcher = CONSTANT_DECLARATION_PATTERN.matcher(line);
             if (matcher.matches()) {
-                // Put constant key and value pair into map
-                constants.put(matcher.group(1), matcher.group(2));
+                // Get the constant key and value
+                String key = matcher.group(1);
+                String value = matcher.group(2);
+
+                // Resolve widget attributes and constants
+                value = resolveWidgetAttributesAndConstants(value, components, constants);
+
+                // Put the key-value pair in the map of constants
+                constants.put(key, value);
 
                 // Continue
                 continue;
@@ -520,8 +527,8 @@ public final class GUILoader {
     /// @param components the map of components declared in the GUI file
     /// @param constants the map of constants declared in the GUI file
     private static void parseParameter(Builder<?> builder, String line, Scanner scanner, Map<String, Component> components, Map<String, String> constants) {
-        // Remove surrounding whitespace, resolve widget attributes and constants
-        line = resolveWidgetAttributesAndConstants(line.strip(), components, constants);
+        // Remove surrounding whitespace
+        line = line.strip();
 
         // Get the matcher for the parameter declaration pattern
         Matcher matcher = PARAMETER_DECLARATION_PATTERN.matcher(line);
@@ -538,6 +545,9 @@ public final class GUILoader {
         // Get the parameter key and value
         String key = matcher.group(1);
         String value = matcher.group(2);
+
+        // Resolve widget attributes and constants
+        value = resolveWidgetAttributesAndConstants(value, components, constants);
 
         // Line declares a list parameter -> parse list parameter and set the value of the parameter tied to the key
         if ("[".equals(value)) parseListParameter(scanner, components, constants)
