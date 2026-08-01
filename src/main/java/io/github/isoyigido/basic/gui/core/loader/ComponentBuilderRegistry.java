@@ -81,7 +81,7 @@ public final class ComponentBuilderRegistry {
                     constructor.newInstance();
 
                     // Put the component type and the corresponding new instance supplier in the map
-                    registry.put(type, () -> {
+                    boolean existing = registry.putIfAbsent(type, () -> {
                         try {
                             // Return an optional containing the new instance
                             return Optional.of(constructor.newInstance());
@@ -93,7 +93,10 @@ public final class ComponentBuilderRegistry {
                             // Return an empty optional
                             return Optional.empty();
                         }
-                    });
+                    }) != null;
+
+                    // If the component builder type has already been registered, log warning
+                    if (existing) logger.warn("Encountered duplicate component builder type. value={}", type);
 
                 } catch (NoSuchMethodException _) {
                     // Log error
