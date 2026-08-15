@@ -1,3 +1,9 @@
+## [0.8.1](https://github.com/isoyigido/basic-gui/compare/0.8.0...0.8.1) (2026-08-15)
+
+### Bug Fixes
+
+* **core:** capture overlay reference locally to prevent null race condition during rendering and updating ([bc44cd5](https://github.com/isoyigido/basic-gui/commit/bc44cd502bfbf5d83caff726b6578b1f9f594209))
+
 ## [0.8.0](https://github.com/isoyigido/basic-gui/compare/0.7.0...0.8.0) (2026-08-15)
 
 ### Features
