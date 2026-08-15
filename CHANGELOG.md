@@ -1,3 +1,13 @@
+## [0.8.0](https://github.com/isoyigido/basic-gui/compare/0.7.0...0.8.0) (2026-08-15)
+
+### Features
+
+* **loader:** enable attribute and constant resolution in GUILoader constant declarations ([f88cf08](https://github.com/isoyigido/basic-gui/commit/f88cf08ab744c79da38f51eeabf1b929bc13f459))
+
+### Bug Fixes
+
+* **core:** skip updates and input events for non-visible widgets ([4673401](https://github.com/isoyigido/basic-gui/commit/4673401ee5481240073e9974384d6d477b9420bd))
+
 ## [0.7.0](https://github.com/isoyigido/basic-gui/compare/0.6.0...0.7.0) (2026-08-01)
 
 ### Features
