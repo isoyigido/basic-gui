@@ -74,8 +74,8 @@ public final class Widget {
         this.y = this.anchor.getY(this.anchorY, this.component.height);
     }
 
-    /// Renders the component contained in this widget.
-    /// Forwards the render call to each child widget.
+    /// Renders the component contained in this widget and forwards the render call to each child widget
+    /// if this widget is visible.
     /// @param g the graphics context to render on
     public void render(Graphics2D g) {
         // If this widget is not visible, return
@@ -104,9 +104,12 @@ public final class Widget {
         gLocal.dispose();
     }
 
-    /// Updates the component contained in this widget.
-    /// Forwards the update call to each child widget.
+    /// Updates the component contained in this widget and forwards the update call to each child widget
+    /// if this widget is visible.
     public void update() {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Update the contained component
         this.component.update();
 
@@ -283,11 +286,15 @@ public final class Widget {
     }
 
     // --- INPUT EVENT METHODS ---
-    /// Forwards the mouse click event to the contained component and its child widgets. Localizes the input coordinates.
+    /// Forwards the mouse click event to the contained component and its child widgets if this widget is visible.
+    /// Localizes the input coordinates.
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
     void onMouseClicked(int x, int y, MouseButton mouseButton) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -301,11 +308,15 @@ public final class Widget {
         this.component.mouseClickEvent(xLocal, yLocal, mouseButton);
     }
 
-    /// Forwards the mouse press event to the contained component and its child widgets. Localizes the input coordinates.
+    /// Forwards the mouse press event to the contained component and its child widgets if this widget is visible.
+    /// Localizes the input coordinates.
     /// @param x the x-coordinate of the press
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
     void onMousePressed(int x, int y, MouseButton mouseButton) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -319,9 +330,12 @@ public final class Widget {
         this.component.mousePressEvent(xLocal, yLocal, mouseButton);
     }
 
-    /// Forwards the mouse release event to the contained component and its child widgets.
+    /// Forwards the mouse release event to the contained component and its child widgets if this widget is visible.
     /// @param mouseButton the mouse button that is released
     void onMouseReleased(MouseButton mouseButton) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Forward the mouse release event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onMouseReleased(mouseButton);
@@ -331,10 +345,14 @@ public final class Widget {
         this.component.mouseReleaseEvent(mouseButton);
     }
 
-    /// Forwards the mouse move event to the contained component and its child widgets. Localizes the input coordinates.
+    /// Forwards the mouse move event to the contained component and its child widgets if this widget is visible.
+    /// Localizes the input coordinates.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     void onMouseMoved(int x, int y) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -348,11 +366,15 @@ public final class Widget {
         this.component.mouseMoveEvent(xLocal, yLocal);
     }
 
-    /// Forwards the mouse drag event to the contained component and its child widgets. Localizes the input coordinates.
+    /// Forwards the mouse drag event to the contained component and its child widgets if this widget is visible.
+    /// Localizes the input coordinates.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
     void onMouseDragged(int x, int y, MouseButton mouseButton) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
         int yLocal = y - this.y - this.component.offsetY;
@@ -366,9 +388,12 @@ public final class Widget {
         this.component.mouseDragEvent(xLocal, yLocal, mouseButton);
     }
 
-    /// Forwards the mouse wheel move event to the contained component and its child widgets.
+    /// Forwards the mouse wheel move event to the contained component and its child widgets if this widget is visible.
     /// @param e the mouse wheel event
     void onMouseWheelMoved(MouseWheelEvent e) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Forward the mouse wheel move event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onMouseWheelMoved(e);
@@ -378,9 +403,12 @@ public final class Widget {
         this.component.mouseWheelEvent(e);
     }
 
-    /// Forwards the key typing event to the contained component and its child widgets.
+    /// Forwards the key typing event to the contained component and its child widgets if this widget is visible.
     /// @param e the key event
     void onKeyTyped(KeyEvent e) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Forward the key typing event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyTyped(e);
@@ -390,9 +418,12 @@ public final class Widget {
         this.component.keyTypingEvent(e);
     }
 
-    /// Forwards the key pressing event to the contained component and its child widgets.
+    /// Forwards the key pressing event to the contained component and its child widgets if this widget is visible.
     /// @param e the key event
     void onKeyPressed(KeyEvent e) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Forward the key press event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyPressed(e);
@@ -402,9 +433,12 @@ public final class Widget {
         this.component.keyPressEvent(e);
     }
 
-    /// Forwards the key releasing event to the contained component and its child widgets.
+    /// Forwards the key releasing event to the contained component and its child widgets if this widget is visible.
     /// @param e the key event
     void onKeyReleased(KeyEvent e) {
+        // If this widget is not visible, return
+        if (!this.visible) return;
+
         // Forward the key release event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
             this.component.childWidgets.get(i).onKeyReleased(e);
