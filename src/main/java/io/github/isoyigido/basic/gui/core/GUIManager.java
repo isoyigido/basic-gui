@@ -147,7 +147,10 @@ public final class GUIManager {
 
         // Render active alerts and the global overlay
         activeAlerts.forEach(alert -> alert.render(g));
-        if (overlay != null) overlay.render(g);
+
+        // Capture reference locally to prevent a null race condition
+        Overlay localOverlay = overlay;
+        if (localOverlay != null) localOverlay.render(g);
     }
 
     /// Forwards the update call to the current GUI, the global overlay, and active alerts.
@@ -157,7 +160,10 @@ public final class GUIManager {
 
         // Update active alerts and the global overlay
         activeAlerts.forEach(Alert::update);
-        if (overlay != null) overlay.update();
+
+        // Capture reference locally to prevent a null race condition
+        Overlay localOverlay = overlay;
+        if (localOverlay != null) localOverlay.update();
     }
 
     /// Returns the current mouse cursor.
