@@ -261,7 +261,7 @@ public final class GUIManager {
         activeAlerts.add(alert);
     }
 
-    /// Sets a global key bind. Can be called multiple times with
+    /// Sets a new global key bind.
     /// @param key the character of the bound key
     /// @param action the action that is run when the bound key is pressed
     /// @throws NullPointerException if the input `action` is null
