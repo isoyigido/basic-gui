@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /// This annotation should only be used to annotate concrete subclasses of {@link ComponentBuilder}.
 ///
-/// Marks the annotated {@link ComponentBuilder} subclass for static registry in {@link ComponentBuilderRegistry}.
+/// Marks the annotated {@link ComponentBuilder} subclass for static registration in {@link ComponentBuilderRegistry}.
 /// The {@link #type()} indicates the component type in the GUI file which links to the annotated
 /// {@link ComponentBuilder} subclass. The {@link GUILoader} class uses the {@link ComponentBuilderRegistry}
 /// to get the right {@link ComponentBuilder} instance for a given component type.
