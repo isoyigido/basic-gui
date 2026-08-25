@@ -65,4 +65,7 @@ dependencies {
 * **isoyigido** - [GitHub Profile](https://github.com/isoyigido)
 
 ## License
+
+Copyright © 2026 İsmail Yiğit Özmen.
+
 This project is licensed under the [Apache License 2.0](LICENSE).
