@@ -1,3 +1,9 @@
+## [0.9.0](https://github.com/isoyigido/basic-gui/compare/0.8.1...0.9.0) (2026-08-25)
+
+### Features
+
+* **loader:** introduce MethodParameter for referencing methods ([d041e0d](https://github.com/isoyigido/basic-gui/commit/d041e0d1a8a885f313e18deeff6269da1b117e44))
+
 ## [0.8.1](https://github.com/isoyigido/basic-gui/compare/0.8.0...0.8.1) (2026-08-15)
 
 ### Bug Fixes
