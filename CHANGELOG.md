@@ -1,3 +1,9 @@
+## [0.9.1](https://github.com/isoyigido/basic-gui/compare/0.9.0...0.9.1) (2026-08-26)
+
+### Bug Fixes
+
+* **core:** expose dimension setter methods in Trigger component ([7e24ade](https://github.com/isoyigido/basic-gui/commit/7e24ade7013226ed59595dd8b9a04c8f559342cb))
+
 ## [0.9.0](https://github.com/isoyigido/basic-gui/compare/0.8.1...0.9.0) (2026-08-25)
 
 ### Features
