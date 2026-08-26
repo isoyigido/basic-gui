@@ -44,6 +44,34 @@ public class Trigger extends Component {
         this.setActive(true);
     }
 
+    /// Sets the width of this trigger.
+    ///
+    /// If this trigger is contained in a widget, the position of the widget is updated as well.
+    ///
+    /// @param width the new width of this trigger (in pixels)
+    @Override
+    public void setWidth(int width) {
+        super.setWidth(width);
+    }
+
+    /// Sets the height of this trigger.
+    ///
+    /// If this trigger is contained in a widget, the position of the widget is updated as well.
+    ///
+    /// @param height the new height of this trigger (in pixels)
+    @Override
+    public void setHeight(int height) {
+        super.setHeight(height);
+    }
+
+    /// Sets the dimensions of this trigger using {@link #setWidth(int)} and {@link #setHeight(int)}.
+    /// @param width the new width of this trigger (in pixels)
+    /// @param height the new height of this trigger (in pixels)
+    @Override
+    public void setDimensions(int width, int height) {
+        super.setDimensions(width, height);
+    }
+
     /// Registers a click on this trigger.
     /// If this trigger is active and the given mouse button has a set action, runs the action.
     /// @param mouseButton the mouse button that is clicked
