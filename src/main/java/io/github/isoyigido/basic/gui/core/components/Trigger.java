@@ -113,10 +113,20 @@ public class Trigger extends Component {
     }
 
     /// If the clicked coordinates lie on this trigger, calls {@link #click} with the clicked mouse button.
+    /// @return whether the clicked coordinates lie on this trigger
     @Override
-    public void mouseClickEvent(int x, int y, MouseButton mouseButton) {
-        // If clicked on the trigger, register a click
-        if (this.contains(x, y)) this.click(mouseButton);
+    public boolean mouseClickEvent(int x, int y, MouseButton mouseButton) {
+        // If clicked on the trigger
+        if (this.contains(x, y)) {
+            // Register a click
+            this.click(mouseButton);
+
+            // Consume the event
+            return true;
+        }
+
+        // Do not consume the event
+        return false;
     }
 
     // --- GETTERS ---
