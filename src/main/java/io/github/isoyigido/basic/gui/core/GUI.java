@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /// Represents a base GUI within the GUI framework.
 /// Provides an {@link #addWidget(Widget)} method to add widgets.
@@ -19,7 +20,7 @@ public class GUI {
     private boolean inputEnabled = true;
 
     /// The widget that receives input events, even if input events are disabled
-    private Widget exception = null;
+    private AtomicReference<Widget> exception = new AtomicReference<>();
 
     /// Whether this GUI has been compiled
     private boolean compiled = false;
@@ -111,7 +112,7 @@ public class GUI {
         this.inputEnabled = false;
 
         // Set the exception
-        this.exception = exception;
+        this.exception.set(exception);
     }
 
     // --- INPUT EVENT METHODS ---
@@ -121,13 +122,17 @@ public class GUI {
     /// @param mouseButton the mouse button that is clicked
     /// @return whether the mouse click event is consumed
     boolean onMouseClicked(int x, int y, MouseButton mouseButton) {
-        // If input is enabled, forward the mouse click event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            if (this.widgets.get(i).onMouseClicked(x, y, mouseButton)) return true;
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse click event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            return (exception != null) && exception.onMouseClicked(x, y, mouseButton);
         }
 
-        // Forward the mouse click event to the exception (if there is one)
-        else if (this.exception != null) return this.exception.onMouseClicked(x, y, mouseButton);
+        // Forward the mouse click event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            if (this.widgets.get(i).onMouseClicked(x, y, mouseButton)) return true;
+        }
 
         // Return false
         return false;
@@ -138,38 +143,59 @@ public class GUI {
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
     void onMousePressed(int x, int y, MouseButton mouseButton) {
-        // If input is enabled, forward the mouse press event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onMousePressed(x, y, mouseButton);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse press event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onMousePressed(x, y, mouseButton);
+
+            // Return
+            return;
         }
 
-        // Forward the mouse press event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onMousePressed(x, y, mouseButton);
+        // Forward the mouse press event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onMousePressed(x, y, mouseButton);
+        }
     }
 
     /// Forwards the mouse release event to the widgets contained in this GUI.
     /// @param mouseButton the mouse button that is released
     void onMouseReleased(MouseButton mouseButton) {
-        // If input is enabled, forward the mouse release event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onMouseReleased(mouseButton);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse release event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onMouseReleased(mouseButton);
+
+            // Return
+            return;
         }
 
-        // Forward the mouse release event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onMouseReleased(mouseButton);
+        // Forward the mouse release event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onMouseReleased(mouseButton);
+        }
     }
 
     /// Forwards the mouse move event to the widgets contained in this GUI.
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     void onMouseMoved(int x, int y) {
-        // If input is enabled, forward the mouse move event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onMouseMoved(x, y);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse move event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onMouseMoved(x, y);
+
+            // Return
+            return;
         }
 
-        // Forward the mouse move event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onMouseMoved(x, y);
+        // Forward the mouse move event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onMouseMoved(x, y);
+        }
     }
 
     /// Forwards the mouse drag event to the widgets contained in this GUI.
@@ -177,39 +203,57 @@ public class GUI {
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
     void onMouseDragged(int x, int y, MouseButton mouseButton) {
-        // If input is enabled, forward the mouse drag event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onMouseDragged(x, y, mouseButton);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse drag event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onMouseDragged(x, y, mouseButton);
+
+            // Return
+            return;
         }
 
-        // Forward the mouse drag event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onMouseDragged(x, y, mouseButton);
+        // Forward the mouse drag event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onMouseDragged(x, y, mouseButton);
+        }
     }
 
     /// Forwards the mouse wheel move event to the widgets contained in this GUI.
     /// @param wheelRotation the mouse wheel rotation (1 for down, -1 for up, 0 for partial rotation)
     /// @param preciseWheelRotation the precise mouse wheel rotation (positive values for down, negative values for up)
     void onMouseWheelMoved(int wheelRotation, double preciseWheelRotation) {
-        // If input is enabled, forward the mouse wheel event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onMouseWheelMoved(wheelRotation, preciseWheelRotation);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the mouse wheel event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onMouseWheelMoved(wheelRotation, preciseWheelRotation);
+
+            // Return
+            return;
         }
 
-        // Forward the mouse wheel event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onMouseWheelMoved(wheelRotation, preciseWheelRotation);
+        // Forward the mouse wheel event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onMouseWheelMoved(wheelRotation, preciseWheelRotation);
+        }
     }
 
     /// Forwards the key typing event to the widgets contained in this GUI.
     /// @param keyChar the typed character
     /// @return whether the key typing event is consumed
     boolean onKeyTyped(char keyChar) {
-        // If input is enabled, forward the key typing event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            if (this.widgets.get(i).onKeyTyped(keyChar)) return true;
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the key typing event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            return (exception != null) && exception.onKeyTyped(keyChar);
         }
 
-        // Forward the key typing event to the exception (if there is one)
-        else if (this.exception != null) return this.exception.onKeyTyped(keyChar);
+        // Forward the key typing event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            if (this.widgets.get(i).onKeyTyped(keyChar)) return true;
+        }
 
         // Return false
         return false;
@@ -218,24 +262,38 @@ public class GUI {
     /// Forwards the key pressing event to the widgets contained in this GUI.
     /// @param keyCode the key code of the pressed key
     void onKeyPressed(int keyCode) {
-        // If input is enabled, forward the key press event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onKeyPressed(keyCode);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the key press event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onKeyPressed(keyCode);
+
+            // Return
+            return;
         }
 
-        // Forward the key press event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onKeyPressed(keyCode);
+        // Forward the key press event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onKeyPressed(keyCode);
+        }
     }
 
     /// Forwards the key releasing event to the widgets contained in this GUI.
     /// @param keyCode the key code of the released key
     void onKeyReleased(int keyCode) {
-        // If input is enabled, forward the key release event to each element
-        if (this.inputEnabled) for (int i = this.widgets.size() - 1; i >= 0; i--) {
-            this.widgets.get(i).onKeyReleased(keyCode);
+        // If input is disabled
+        if (!this.inputEnabled) {
+            // Forward the key release event to the exception (if there is one)
+            Widget exception = this.exception.get();
+            if (exception != null) exception.onKeyReleased(keyCode);
+
+            // Return
+            return;
         }
 
-        // Forward the key release event to the exception (if there is one)
-        else if (this.exception != null) this.exception.onKeyReleased(keyCode);
+        // Forward the key release event to each element
+        for (int i = this.widgets.size() - 1; i >= 0; i--) {
+            this.widgets.get(i).onKeyReleased(keyCode);
+        }
     }
 }
