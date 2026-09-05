@@ -1,3 +1,9 @@
+## [0.9.2](https://github.com/isoyigido/basic-gui/compare/0.9.1...0.9.2) (2026-09-05)
+
+### Bug Fixes
+
+* **core:** use an atomic reference to set the exception in order to prevent null race condition in GUI ([4d0bca9](https://github.com/isoyigido/basic-gui/commit/4d0bca99847ca28e00bde35d9619c791ed647263))
+
 ## [0.9.1](https://github.com/isoyigido/basic-gui/compare/0.9.0...0.9.1) (2026-08-26)
 
 ### Bug Fixes
