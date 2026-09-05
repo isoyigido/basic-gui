@@ -1,8 +1,6 @@
 package io.github.isoyigido.basic.gui.core;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -212,7 +210,10 @@ public abstract class Component {
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
-    public void mouseClickEvent(int x, int y, MouseButton mouseButton) {}
+    /// @return whether to consume the mouse click event
+    public boolean mouseClickEvent(int x, int y, MouseButton mouseButton) {
+        return false;
+    }
 
     /// Override this method to handle a mouse press event.
     /// @param x the x-coordinate of the press
@@ -236,20 +237,24 @@ public abstract class Component {
     public void mouseDragEvent(int x, int y, MouseButton mouseButton) {}
 
     /// Override this method to handle a mouse wheel move event.
-    /// @param e the mouse wheel event
-    public void mouseWheelEvent(MouseWheelEvent e) {}
+    /// @param wheelRotation the mouse wheel rotation (1 for down, -1 for up, 0 for partial rotation)
+    /// @param preciseWheelRotation the precise mouse wheel rotation (positive values for down, negative values for up)
+    public void mouseWheelEvent(int wheelRotation, double preciseWheelRotation) {}
 
     /// Override this method to handle a key typing event.
-    /// @param e the key event
-    public void keyTypingEvent(KeyEvent e) {}
+    /// @param keyChar the typed character
+    /// @return whether to consume the key typing event
+    public boolean keyTypingEvent(char keyChar) {
+        return false;
+    }
 
     /// Override this method to handle a key pressing event.
-    /// @param e the key event
-    public void keyPressEvent(KeyEvent e) {}
+    /// @param keyCode the key code of the pressed key
+    public void keyPressEvent(int keyCode) {}
 
     /// Override this method to handle a key releasing event.
-    /// @param e the key event
-    public void keyReleaseEvent(KeyEvent e) {}
+    /// @param keyCode the key code of the released key
+    public void keyReleaseEvent(int keyCode) {}
 
     // --- WIDGET FACTORY METHODS ---
     /// Returns a widget containing this component centered at the given coordinates.
