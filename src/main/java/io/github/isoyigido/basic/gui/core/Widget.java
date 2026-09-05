@@ -3,8 +3,6 @@ package io.github.isoyigido.basic.gui.core;
 import io.github.isoyigido.basic.gui.window.ScreenConfig;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -291,9 +289,10 @@ public final class Widget {
     /// @param x the x-coordinate of the click
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
-    void onMouseClicked(int x, int y, MouseButton mouseButton) {
+    /// @return whether the mouse click event is consumed
+    boolean onMouseClicked(int x, int y, MouseButton mouseButton) {
         // If this widget is not visible, return
-        if (!this.visible) return;
+        if (!this.visible) return false;
 
         // Convert the input coordinates to local coordinates
         int xLocal = x - this.x - this.component.offsetX;
@@ -301,11 +300,11 @@ public final class Widget {
 
         // Forward the mouse click event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
-            this.component.childWidgets.get(i).onMouseClicked(xLocal, yLocal, mouseButton);
+            if (this.component.childWidgets.get(i).onMouseClicked(xLocal, yLocal, mouseButton)) return true;
         }
 
         // Forward the mouse click event to the contained component
-        this.component.mouseClickEvent(xLocal, yLocal, mouseButton);
+        return this.component.mouseClickEvent(xLocal, yLocal, mouseButton);
     }
 
     /// Forwards the mouse press event to the contained component and its child widgets if this widget is visible.
@@ -389,63 +388,65 @@ public final class Widget {
     }
 
     /// Forwards the mouse wheel move event to the contained component and its child widgets if this widget is visible.
-    /// @param e the mouse wheel event
-    void onMouseWheelMoved(MouseWheelEvent e) {
+    /// @param wheelRotation the mouse wheel rotation (1 for down, -1 for up, 0 for partial rotation)
+    /// @param preciseWheelRotation the precise mouse wheel rotation (positive values for down, negative values for up)
+    void onMouseWheelMoved(int wheelRotation, double preciseWheelRotation) {
         // If this widget is not visible, return
         if (!this.visible) return;
 
         // Forward the mouse wheel move event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
-            this.component.childWidgets.get(i).onMouseWheelMoved(e);
+            this.component.childWidgets.get(i).onMouseWheelMoved(wheelRotation, preciseWheelRotation);
         }
 
         // Forward the mouse wheel move event to the contained component
-        this.component.mouseWheelEvent(e);
+        this.component.mouseWheelEvent(wheelRotation, preciseWheelRotation);
     }
 
     /// Forwards the key typing event to the contained component and its child widgets if this widget is visible.
-    /// @param e the key event
-    void onKeyTyped(KeyEvent e) {
+    /// @param keyChar the typed character
+    /// @return whether the key typing event is consumed
+    boolean onKeyTyped(char keyChar) {
         // If this widget is not visible, return
-        if (!this.visible) return;
+        if (!this.visible) return false;
 
         // Forward the key typing event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
-            this.component.childWidgets.get(i).onKeyTyped(e);
+            if (this.component.childWidgets.get(i).onKeyTyped(keyChar)) return true;
         }
 
         // Forward the key typing event to the contained component
-        this.component.keyTypingEvent(e);
+        return this.component.keyTypingEvent(keyChar);
     }
 
     /// Forwards the key pressing event to the contained component and its child widgets if this widget is visible.
-    /// @param e the key event
-    void onKeyPressed(KeyEvent e) {
+    /// @param keyCode the key code of the pressed key
+    void onKeyPressed(int keyCode) {
         // If this widget is not visible, return
         if (!this.visible) return;
 
         // Forward the key press event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
-            this.component.childWidgets.get(i).onKeyPressed(e);
+            this.component.childWidgets.get(i).onKeyPressed(keyCode);
         }
 
         // Forward the key press event to the contained component
-        this.component.keyPressEvent(e);
+        this.component.keyPressEvent(keyCode);
     }
 
     /// Forwards the key releasing event to the contained component and its child widgets if this widget is visible.
-    /// @param e the key event
-    void onKeyReleased(KeyEvent e) {
+    /// @param keyCode the key code of the released key
+    void onKeyReleased(int keyCode) {
         // If this widget is not visible, return
         if (!this.visible) return;
 
         // Forward the key release event to each child widget
         for (int i = this.component.childWidgets.size() - 1; i >= 0; i--) {
-            this.component.childWidgets.get(i).onKeyReleased(e);
+            this.component.childWidgets.get(i).onKeyReleased(keyCode);
         }
 
         // Forward the key release event to the contained component
-        this.component.keyReleaseEvent(e);
+        this.component.keyReleaseEvent(keyCode);
     }
 
     // --- FACTORY METHODS ---

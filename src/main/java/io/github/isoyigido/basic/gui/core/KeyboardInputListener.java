@@ -11,18 +11,21 @@ public final class KeyboardInputListener extends KeyAdapter {
     @Override
     public void keyTyped(KeyEvent e) {
         // Register a key typing event
-        GUIManager.onKeyTyped(e);
+        char keyChar = e.getKeyChar();
+        GUIManager.onKeyTyped(keyChar);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         // Register a key press event
-        GUIManager.onKeyPressed(e);
+        int keyCode = e.getKeyCode();
+        GUIManager.onKeyPressed(keyCode);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         // Register a key release event
-        GUIManager.onKeyReleased(e);
+        int keyCode = e.getKeyCode();
+        GUIManager.onKeyReleased(keyCode);
     }
 }

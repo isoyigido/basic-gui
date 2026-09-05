@@ -65,7 +65,9 @@ public final class MouseInputListener extends MouseAdapter {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         // Register a mouse wheel move event
-        GUIManager.onMouseWheelMoved(e);
+        int wheelRotation = e.getWheelRotation();
+        double preciseWheelRotation = e.getPreciseWheelRotation();
+        GUIManager.onMouseWheelMoved(wheelRotation, preciseWheelRotation);
     }
 
     /// Returns the x-coordinate of the mouse cursor on the virtual screen.

@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -284,7 +282,7 @@ public final class GUIManager {
     /// @param y the y-coordinate of the click
     /// @param mouseButton the mouse button that is clicked
     static void onMouseClicked(int x, int y, MouseButton mouseButton) {
-        if (overlay == null) currentGUI.onMouseClicked(x, y, mouseButton);
+        currentGUI.onMouseClicked(x, y, mouseButton);
     }
 
     /// Forwards the mouse press event to the current GUI.
@@ -292,7 +290,7 @@ public final class GUIManager {
     /// @param y the y-coordinate of the press
     /// @param mouseButton the mouse button that is pressed
     static void onMousePressed(int x, int y, MouseButton mouseButton) {
-        if (overlay == null) currentGUI.onMousePressed(x, y, mouseButton);
+        currentGUI.onMousePressed(x, y, mouseButton);
     }
 
     /// Forwards the mouse release event to the current GUI.
@@ -305,7 +303,7 @@ public final class GUIManager {
     /// @param x the x-coordinate of the mouse
     /// @param y the y-coordinate of the mouse
     static void onMouseMoved(int x, int y) {
-        if (overlay == null) currentGUI.onMouseMoved(x, y);
+        currentGUI.onMouseMoved(x, y);
     }
 
     /// Forwards the mouse drag event to the current GUI.
@@ -313,42 +311,38 @@ public final class GUIManager {
     /// @param y the y-coordinate of the mouse
     /// @param mouseButton the mouse button that is dragged
     static void onMouseDragged(int x, int y, MouseButton mouseButton) {
-        if (overlay == null) currentGUI.onMouseDragged(x, y, mouseButton);
+        currentGUI.onMouseDragged(x, y, mouseButton);
     }
 
     /// Forwards the mouse wheel move event to the current GUI.
-    /// @param e the mouse wheel event
-    static void onMouseWheelMoved(MouseWheelEvent e) {
-        if (overlay == null) currentGUI.onMouseWheelMoved(e);
+    /// @param wheelRotation the mouse wheel rotation (1 for down, -1 for up, 0 for partial rotation)
+    /// @param preciseWheelRotation the precise mouse wheel rotation (positive values for down, negative values for up)
+    static void onMouseWheelMoved(int wheelRotation, double preciseWheelRotation) {
+        currentGUI.onMouseWheelMoved(wheelRotation, preciseWheelRotation);
     }
 
     /// Forwards the key typing event to the current GUI.
-    /// @param e the key event
-    static void onKeyTyped(KeyEvent e) {
-        if (overlay == null) currentGUI.onKeyTyped(e);
+    /// @param keyChar the typed character
+    static void onKeyTyped(char keyChar) {
+        if (currentGUI.onKeyTyped(keyChar)) return;
 
-        // If the key typing event has not been consumed
-        if (!e.isConsumed()) {
-            // Get the character of the typed key
-            char keyChar = e.getKeyChar();
-
-            // Check each global key bind
-            globalKeyBinds.forEach((key, action) -> {
-                // If the bound key is pressed, run the action
-                if (key == keyChar) action.run();
-            });
-        }
+        // - Key typing event is not consumed -
+        // Check each global key bind
+        globalKeyBinds.forEach((key, action) -> {
+            // If the bound key is pressed, run the action
+            if (key == keyChar) action.run();
+        });
     }
 
     /// Forwards the key pressing event to the current GUI.
-    /// @param e the key event
-    static void onKeyPressed(KeyEvent e) {
-        if (overlay == null) currentGUI.onKeyPressed(e);
+    /// @param keyCode the key code of the pressed key
+    static void onKeyPressed(int keyCode) {
+        currentGUI.onKeyPressed(keyCode);
     }
 
     /// Forwards the key releasing event to the current GUI.
-    /// @param e the key event
-    static void onKeyReleased(KeyEvent e) {
-        currentGUI.onKeyReleased(e);
+    /// @param keyCode the key code of the released key
+    static void onKeyReleased(int keyCode) {
+        currentGUI.onKeyReleased(keyCode);
     }
 }
