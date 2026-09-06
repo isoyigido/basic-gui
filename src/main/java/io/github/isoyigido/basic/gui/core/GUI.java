@@ -20,7 +20,7 @@ public class GUI {
     private boolean inputEnabled = true;
 
     /// The widget that receives input events, even if input events are disabled
-    private AtomicReference<Widget> exception = new AtomicReference<>();
+    private final AtomicReference<Widget> exception = new AtomicReference<>();
 
     /// Whether this GUI has been compiled
     private boolean compiled = false;
@@ -96,7 +96,7 @@ public class GUI {
         this.inputEnabled = true;
 
         // Remove the exception
-        this.exception = null;
+        this.exception.set(null);
     }
 
     /// Disables input events for every widget in this GUI.
