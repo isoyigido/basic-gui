@@ -1,3 +1,9 @@
+## [0.9.3](https://github.com/isoyigido/basic-gui/compare/0.9.2...0.9.3) (2026-09-06)
+
+### Bug Fixes
+
+* **core:** fix null pointer in GUI ([5c24e16](https://github.com/isoyigido/basic-gui/commit/5c24e16af56653e16a94400011b9fc929142fe17))
+
 ## [0.9.2](https://github.com/isoyigido/basic-gui/compare/0.9.1...0.9.2) (2026-09-05)
 
 ### Bug Fixes
